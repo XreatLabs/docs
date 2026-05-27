@@ -108,20 +108,20 @@
   "hotPaths": [
     {
       "path": "docs.json",
-      "accessCount": 3,
-      "lastAccessed": 1779906119020,
+      "accessCount": 5,
+      "lastAccessed": 1779906769947,
+      "type": "file"
+    },
+    {
+      "path": "logo/xreatlabs.png",
+      "accessCount": 2,
+      "lastAccessed": 1779906350121,
       "type": "file"
     },
     {
       "path": "logo/dark.svg",
       "accessCount": 1,
       "lastAccessed": 1779904655154,
-      "type": "file"
-    },
-    {
-      "path": "logo/xreatlabs.png",
-      "accessCount": 1,
-      "lastAccessed": 1779906104467,
       "type": "file"
     }
   ],
