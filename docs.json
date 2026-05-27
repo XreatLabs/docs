@@ -29,17 +29,6 @@
             "pages": [
               "index"
             ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
           }
         ]
       },
