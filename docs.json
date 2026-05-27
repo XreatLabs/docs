@@ -27,26 +27,7 @@
           {
             "group": "Getting started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
+              "index"
             ]
           },
           {
@@ -108,7 +89,7 @@
     "primary": {
       "type": "button",
       "label": "Get Started",
-      "href": "/quickstart"
+      "href": "/"
     }
   },
   "contextual": {
