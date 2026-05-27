@@ -7,10 +7,7 @@
     "light": "#FFAB66",
     "dark": "#E5722D"
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
+  "logo": "/logo/xreatlabs.png",
   "favicon": "/favicon.png",
   "stylesheets": [
     "/styles.css"

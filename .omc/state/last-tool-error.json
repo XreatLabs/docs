@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__chrome-devtools__evaluate_script",
+  "tool_input_preview": "{\"function\":\"() => {\\n  // Check all the details of how their logo is rendered\\n  const logoImg = document.querySelector('.nav-logo img');\\n  const navLogo = document.querySelector('.nav-logo');\\n  re...",
+  "error": "Error: Failed to execute 'getComputedStyle' on 'Window': parameter 1 is not of type 'Element'.",
+  "timestamp": "2026-05-27T18:08:33.987Z",
+  "retry_count": 1
+}

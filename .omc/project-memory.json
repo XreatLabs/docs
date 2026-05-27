@@ -1,0 +1,129 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1779904647753,
+  "projectRoot": "/root/docs",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "agent-ready": {
+      "path": "agent-ready",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1779904647748,
+      "keyFiles": [
+        "contextual.mdx",
+        "prompt.mdx",
+        "visibility.mdx"
+      ]
+    },
+    "ai-tools": {
+      "path": "ai-tools",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1779904647749,
+      "keyFiles": [
+        "claude-code.mdx",
+        "cursor.mdx",
+        "windsurf.mdx"
+      ]
+    },
+    "api-reference": {
+      "path": "api-reference",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1779904647752,
+      "keyFiles": [
+        "introduction.mdx",
+        "openapi.json"
+      ]
+    },
+    "essentials": {
+      "path": "essentials",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1779904647752,
+      "keyFiles": [
+        "code.mdx",
+        "components.mdx",
+        "images.mdx",
+        "markdown.mdx",
+        "navigation.mdx"
+      ]
+    },
+    "images": {
+      "path": "images",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1779904647752,
+      "keyFiles": [
+        "checks-passed.png",
+        "hero-dark.png",
+        "hero-light.png"
+      ]
+    },
+    "logo": {
+      "path": "logo",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1779904647752,
+      "keyFiles": [
+        "light.svg",
+        "xreatlabs-logo.png"
+      ]
+    },
+    "snippets": {
+      "path": "snippets",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1779904647752,
+      "keyFiles": [
+        "snippet-intro.mdx"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "docs.json",
+      "accessCount": 3,
+      "lastAccessed": 1779906119020,
+      "type": "file"
+    },
+    {
+      "path": "logo/dark.svg",
+      "accessCount": 1,
+      "lastAccessed": 1779904655154,
+      "type": "file"
+    },
+    {
+      "path": "logo/xreatlabs.png",
+      "accessCount": 1,
+      "lastAccessed": 1779906104467,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
