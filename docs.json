@@ -33,6 +33,17 @@
         ]
       },
       {
+        "tab": "NexAuth",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "nexauth/index"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API reference",
         "groups": [
           {

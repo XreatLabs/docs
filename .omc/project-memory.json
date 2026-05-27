@@ -108,8 +108,8 @@
   "hotPaths": [
     {
       "path": "docs.json",
-      "accessCount": 10,
-      "lastAccessed": 1779908180523,
+      "accessCount": 12,
+      "lastAccessed": 1779909571195,
       "type": "file"
     },
     {
@@ -122,6 +122,12 @@
       "path": "logo/dark.svg",
       "accessCount": 1,
       "lastAccessed": 1779904655154,
+      "type": "file"
+    },
+    {
+      "path": "nexauth/index.mdx",
+      "accessCount": 1,
+      "lastAccessed": 1779909560828,
       "type": "file"
     }
   ],
