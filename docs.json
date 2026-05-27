@@ -3,18 +3,21 @@
   "theme": "mint",
   "name": "XreatLabs",
   "colors": {
-    "primary": "#9B8EB4",
-    "light": "#B8A8D1",
-    "dark": "#7A6B9E",
-    "background": {
-      "light": "#FAF9FC",
-      "dark": "#1A1820"
-    }
+    "primary": "#FF8C42",
+    "light": "#FFAB66",
+    "dark": "#E5722D"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "favicon": "/favicon.png",
-  "logo": {
-    "light": "/logo/xreatlabs-logo.png",
-    "dark": "/logo/xreatlabs-logo.png"
+  "stylesheets": [
+    "/styles.css"
+  ],
+  "topbarCtaButton": {
+    "type": "github",
+    "url": "https://github.com/XreatLabs"
   },
   "navigation": {
     "tabs": [
@@ -124,8 +127,5 @@
       "github": "https://github.com/XreatLabs",
       "linkedin": "https://linkedin.com/company/xreatlabs"
     }
-  },
-  "integrations": {
-    "intercom": ""
   }
 }

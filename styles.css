@@ -1,0 +1,4 @@
+/* Increase logo size in navbar */
+.nav-logo {
+  height: 60px !important;
+}
