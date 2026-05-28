@@ -53,6 +53,12 @@
             ]
           },
           {
+            "group": "Configuration",
+            "pages": [
+              "nexauth/configuration"
+            ]
+          },
+          {
             "group": "Features",
             "pages": [
               "nexauth/features/premium",
