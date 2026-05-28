@@ -1,0 +1,187 @@
+---
+title: "Premium Account Commands"
+description: "Commands for premium account management and features"
+icon: 'crown'
+---
+
+# Premium Account Commands
+
+Commands for managing premium Minecraft accounts and premium-related features.
+
+## Premium Commands
+
+### `/premium <password>`
+
+Enable premium auto-login for your account.
+
+```bash
+/premium <password>
+```
+
+**What it does:**
+- Links your current offline account to your premium Minecraft account
+- Enables automatic authentication when you join
+- No password required for future logins
+
+**Requirements:**
+- Must own the premium version of your Minecraft username
+- Must provide your current account password for verification
+
+### `/premiumconfirm`
+
+Confirm premium account linking.
+
+```bash
+/premiumconfirm <code>
+```
+
+Used during the premium linking process to enter the verification code.
+
+**Shows:**
+- Premium status (true/false)
+- Linked premium username
+- Premium UUID
+- Skin loading status
+- Last premium login
+
+### `/cracked`
+
+Disable premium auto-login and revert to password authentication.
+
+```bash
+/cracked <password>
+```
+
+**What it does:**
+- Unlinks your premium account
+- Requires password for future logins
+- Keeps your offline account data
+
+**Use cases:**
+- Switching back to cracked authentication
+- Troubleshooting premium login issues
+
+**Updates:**
+- Premium status from Mojang
+- Skin data
+- Username changes
+- Profile information
+
+## Status and Information Commands
+
+### `/premium status`
+
+Check your premium account status.
+
+```bash
+/premium status
+```
+
+**Shows:**
+- Premium status (true/false)
+- Linked premium username
+- Premium UUID
+- Skin loading status
+- Last premium login
+
+### `/premium refresh`
+
+Manually refresh premium account data.
+
+```bash
+/premium refresh
+```
+
+**Updates:**
+- Premium status from Mojang
+- Skin data
+- Username changes
+- Profile information
+
+**Process:**
+1. Verify offline account ownership
+2. Link premium UUID to account
+3. Transfer data if enabled
+4. Enable premium auto-login
+
+**Benefits:**
+- Keep offline account progress
+- Automatic premium login
+- Unified player data
+
+## Account Linking (Admin Commands)
+
+### `/premium link`
+
+Link premium account to existing offline account.
+
+```bash
+/premium link <offline_username> <password>
+```
+
+**Effects:**
+- Removes premium linking
+- Requires password login
+- Keeps offline account data
+
+### `/premium unlink`
+
+Unlink premium account from current account.
+
+```bash
+/premium unlink <password>
+```
+
+**Effects:**
+- Removes premium linking
+- Requires password login
+- Keeps offline account data
+
+## Skin Management Commands
+
+### `/premium skin refresh`
+
+Force refresh your player skin from Mojang.
+
+```bash
+/premium skin refresh
+```
+
+### `/premium skin clear`
+
+Clear cached skin data.
+
+```bash
+/premium skin clear
+```
+
+## Configuration
+
+```hocon
+# Should we automatically register all players with a premium nickname?
+# !!CRACKED PLAYERS WILL NOT BE ABLE TO REGISTER PREMIUM USERNAMES!!
+auto-register=false
+
+# Sets the strategy for resolving profile conflicts. Available strategies:
+# BLOCK - Kick both players with the message key "kick-name-mismatch"
+# USE_OFFLINE - Use the offline profile
+# OVERWRITE - Overwrite the offline profile's data
+profile-conflict-resolution-strategy=BLOCK
+
+# Sets which method should be used for creating fixed UUID when a new player is created.
+# Available Creators:
+# RANDOM - Generates a random UUID
+# CRACKED - Generates a UUID based on the player's name
+# MOJANG - If the player exists in the Mojang's database, it will be used. Otherwise, CRACKED will be used.
+new-uuid-creator=CRACKED
+```
+
+## Admin Commands
+
+See [Admin Commands](/nexauth/commands/admin) for premium account management by administrators.
+
+## Next Steps
+
+<Card title="Admin Commands" icon="shield" href="/nexauth/commands/admin">
+Administrative commands for server management.
+</Card>

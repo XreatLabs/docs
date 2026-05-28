@@ -1,0 +1,232 @@
+---
+title: Velocity Proxy Installation
+description: Step-by-step guide for installing NexAuth on Velocity proxy servers
+---
+
+# Velocity Proxy Installation
+
+This guide walks you through installing NexAuth on your Velocity proxy server for secure, multi-server authentication.
+
+## Prerequisites
+
+- Java 21 or newer
+- Velocity 3.3.0-SNAPSHOT or newer
+- Backend Paper/Purpur servers
+- Administrative access to server files
+
+## Installation Steps
+
+<Steps>
+  <Step>
+    ##### Download or Build NexAuth
+
+    Choose one of these methods:
+
+    **Option A: Download from Releases**
+
+    Download the latest `NexAuth.jar` from the [GitHub Releases](https://github.com/xreatlabs/NexAuth/releases)
+
+    <Callout type="info">
+      A single `NexAuth.jar` works on both Velocity proxies and Paper/Purpur servers - no separate files needed.
+    </Callout>
+
+    **Option B: Build from Source**
+
+    ```bash
+    # Clone the repository
+    git clone https://github.com/xreatlabs/NexAuth.git
+    cd NexAuth
+
+    # Build the plugin
+    ./gradlew :Plugin:shadowJar
+    ```
+
+    The JAR will be available at `Plugin/build/libs/NexAuth.jar`
+  </Step>
+
+  <Step>
+    ##### Install on Velocity Proxy
+
+    1. Stop your Velocity proxy server
+    2. Navigate to the `plugins/` directory in your Velocity installation
+    3. Copy `NexAuth.jar` into the `plugins/` directory
+    4. Start your Velocity proxy
+  </Step>
+
+  <Step>
+    ##### Initial Configuration Generation
+
+    After first startup:
+
+    1. The plugin will generate a configuration file at `plugins/nexauth/config.conf`
+    2. The server will automatically shut down after generating the config
+    3. This is normal behavior - we'll configure it in the next step
+
+    <Callout type="info">
+      This automatic shutdown is expected behavior. The plugin needs to generate the default configuration before running.
+    </Callout>
+  </Step>
+
+  <Step>
+    ##### Edit Configuration
+
+    Edit `plugins/nexauth/config.conf` with your preferred settings:
+
+    ```hocon
+    # Example basic configuration
+    database {
+        type=nexauth-sqlite
+        properties {
+            sqlite {
+                path="user-data.db"
+            }
+        }
+    }
+    
+    # Premium authentication
+    auto-register=false
+    profile-conflict-resolution-strategy=BLOCK
+    
+    # Security settings
+    default-crypto-provider=BCrypt-2A
+    max-login-attempts=-1
+    ```
+  </Step>
+
+  <Step>
+    ##### Configure Velocity Backend Servers
+
+    Ensure your `velocity.toml` is properly configured:
+
+    ```toml
+    [player-info-forwarding]
+    enabled = true
+    # Choose one:
+    # legacy = true
+    # modern = true
+
+    [servers]
+    backend1 = {
+      address = "127.0.0.1:25565"
+      attempt-connection = true
+    }
+
+    backend2 = {
+      address = "127.0.0.1:25566"
+      attempt-connection = true
+    }
+    ```
+  </Step>
+
+  <Step>
+    ##### Configure Backend Servers
+
+    **Important:** All backend servers must:
+    - Run Paper/Purpur with `online-mode=false`
+    - NOT be exposed directly to the internet
+    - Have `online-mode=false` in their `server.properties`
+
+    Example `server.properties` for backend servers:
+    ```properties
+    online-mode=false
+    motd=Backend Server
+    server-port=25565
+    ```
+
+    <Callout type="warning">
+      Never expose backend servers directly to the internet. All player connections must go through the Velocity proxy.
+    </Callout>
+  </Step>
+
+  <Step>
+    ##### Restart and Verify
+
+    1. Start your Velocity proxy
+    2. Test authentication with both:
+       - Premium accounts (auto-login)
+       - Offline accounts (registration required)
+    3. Check the logs for any errors
+  </Step>
+</Steps>
+
+## Configuration Reference
+
+### Key Settings for Velocity Mode
+
+```hocon
+# Database configuration
+database {
+    type=nexauth-sqlite
+    properties {
+        sqlite {
+            path="user-data.db"
+        }
+    }
+}
+
+# Premium authentication
+auto-register=false
+profile-conflict-resolution-strategy=BLOCK
+default-crypto-provider=BCrypt-2A
+
+# Security settings
+max-login-attempts=-1
+milliseconds-to-refresh-login-attempts=10000
+
+# Session management
+session-timeout=604800
+
+# UI settings
+use-titles=true
+use-action-bar=false
+hide-player-inventory=true
+
+# Server configuration
+limbo=["limbo0", "limbo1"]
+lobby {
+    root=["lobby0", "lobby1"]
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Plugin generates config then shuts down
+
+This is normal behavior. Edit the config file and restart the server.
+
+#### Players can't connect to backend servers
+
+- Ensure `online-mode=false` on backend servers
+- Check Velocity's `velocity.toml` configuration
+- Verify server addresses are correct
+
+#### Authentication not working
+
+- Check logs for errors
+- Verify premium mode settings
+- Ensure database connection is working
+
+#### Players getting kicked during login
+
+- Increase `register-delay` if experiencing lag
+- Check for conflicting plugins
+- Verify TOTP settings if enabled
+
+### Log Locations
+
+- **Velocity Proxy**: `/path/to/velocity/logs/`
+- **NexAuth Logs**: Included in Velocity logs
+
+### Getting Help
+
+1. Check the [first run configuration](./first-run.mdx) for detailed setup
+2. Review [database setup](./database.mdx) if using external databases
+3. Visit [GitHub Issues](https://github.com/xreatlabs/NexAuth/issues) for support
+
+## Next Steps
+
+- 📖 Configure your [database](./database.mdx) for better performance
+- 📖 Set up [TOTP two-factor authentication](../features/totp.mdx) (coming soon)
+- 📖 Learn about [advanced configuration](../advanced/config-reference.mdx) (coming soon)

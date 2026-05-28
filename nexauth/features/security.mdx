@@ -1,0 +1,108 @@
+---
+title: "Security Features"
+description: "Comprehensive security features to protect player accounts and your server"
+icon: 'shield'
+---
+
+# Security Features
+
+NexAuth implements enterprise-grade security measures to protect player accounts and server integrity.
+
+## Core Security Features
+
+<Features>
+  <Feature 
+    icon="lock"
+    title="Secure Password Hashing"
+    description="bcrypt with adaptive work factor for password storage."
+  />
+  <Feature 
+    icon="shield"
+    title="Brute Force Protection"
+    description="Rate limiting and account lockout after failed attempts."
+  />
+  <Feature 
+    icon="database"
+    title="SQL Injection Prevention"
+    description="Parameterized queries and input validation."
+  />
+  <Feature 
+    icon="eye-off"
+    title="Data Encryption"
+    description="AES-256 encryption for sensitive data at rest."
+  />
+</Features>
+
+## Brute Force Protection
+
+```hocon
+security {
+    login {
+        backoff {
+            # Whether to apply exponential login backoff after wrong password attempts.
+            enabled=false
+            # Initial login backoff in milliseconds.
+            initial-ms=1000
+            # Maximum login backoff in milliseconds.
+            max-ms=30000
+            # Multiplier used by login backoff.
+            multiplier=2
+        }
+        lockout {
+            # Whether to lock login attempts after repeated failures.
+            enabled=false
+            # Wrong login attempts threshold before lockout is applied.
+            threshold=10
+            # Lockout duration in milliseconds after reaching threshold.
+            duration-ms=300000
+        }
+    }
+}
+```
+
+## Password Requirements
+
+```hocon
+# The minimum length of a password. Set to negative to disable.
+minimum-password-length=-1
+```
+
+## Rate Limiting
+
+```hocon
+# Sets the maximum amount of accounts that can be registered from the same IP address.
+# Set to zero or less to disable.
+# !!THIS IS NOT RECOMMENDED!! Due to the lack of IPv4 addresses, sometimes even entire villages share the same IP address.
+ip-limit=-1
+```
+
+## Data Encryption
+
+- **Password hashing** - bcrypt with salt
+- **Session data** - Encrypted storage
+- **Sensitive fields** - AES-256 encryption
+- **Database connections** - SSL/TLS support
+
+## Monitoring & Logging
+
+```hocon
+# Should we enable debug mode? This will print out debug messages to the console.
+debug=true
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Use strong database passwords
+- ✅ Enable SSL for database connections
+- ✅ Regular security updates
+- ✅ Monitor authentication logs
+- ✅ Implement rate limiting
+- ✅ Enable brute force protection
+</Checklist>
+
+## Next Steps
+
+<Card title="API Reference" icon="book" href="/nexauth/api/overview">
+Explore the security API for custom integrations.
+</Card>

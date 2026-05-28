@@ -1,0 +1,120 @@
+---
+title: Getting Started with NexAuth
+description: Quick overview and choosing your deployment mode for NexAuth
+---
+
+# Getting Started with NexAuth
+
+Welcome to NexAuth! A modern Java 21 authentication plugin for Minecraft networks that supports both Velocity proxy deployments and direct Paper/Purpur server installations.
+
+## What is NexAuth?
+
+NexAuth is a feature-rich authentication plugin that provides:
+
+- ✅ **Offline registration/login** for cracked/offline-mode players
+- ✅ **Premium account auto-login** and migration flows
+- ✅ **TOTP two-factor authentication** support
+- ✅ **Session handling** and name validation
+- ✅ **Multiple database backends** (SQLite, MySQL, PostgreSQL)
+- ✅ **Geyser/Floodgate** support for Bedrock players
+- ✅ **Paper inventory hiding** for unauthenticated players
+- ✅ **Operator diagnostics** through built-in status/doctor tools
+
+## Deployment Modes
+
+Choose the installation method that fits your network setup:
+
+<Tabs>
+  <Tab label="Velocity Proxy Mode">
+    Ideal for multi-server networks with security in mind:
+
+    **Benefits:**
+    - **Installation**: Place `NexAuth.jar` on your Velocity proxy
+    - **Backend**: Paper/Purpur servers run in `online-mode=false`
+    - **Security**: Authentication happens before players reach backend servers
+    - **Use Case**: Multi-server networks, large networks, enhanced security
+
+    <Callout type="recommendation">
+      **Recommended** for most production networks with multiple backend servers.
+    </Callout>
+  </Tab>
+
+  <Tab label="Paper/Purpur Direct Mode">
+    Perfect for single-server setups:
+
+    **Benefits:**
+    - **Installation**: Place `NexAuth.jar` directly on your Paper/Purpur server
+    - **Server Mode**: Must run in `online-mode=false`
+    - **Use Case**: Single servers, small networks, simple setups
+
+    <Callout type="info">
+      Best for single-server deployments or development environments.
+    </Callout>
+  </Tab>
+</Tabs>
+
+## System Requirements
+
+### Required
+- Java 21 or newer (Java 25 for testing latest Paper builds)
+- Minecraft server software:
+  - Velocity 3.3.0-SNAPSHOT or newer
+  - Paper 1.20+ or Purpur
+- `online-mode=false` where NexAuth is installed
+
+### Optional
+- MySQL/MariaDB or PostgreSQL database (for SQLite, no additional setup needed)
+- Redis for multi-proxy support (advanced setups only)
+
+## Quick Installation Flow
+
+<Steps>
+  <Step>
+    ##### Download or Build NexAuth
+
+    Download the latest `NexAuth.jar` from [GitHub Releases](https://github.com/xreatlabs/NexAuth/releases) or build with `./gradlew :Plugin:shadowJar`
+
+    <Callout type="info">
+      A single `NexAuth.jar` works on both Velocity proxies and Paper/Purpur servers - no separate files needed.
+    </Callout>
+  </Step>
+
+  <Step>
+    ##### Choose Your Installation Mode
+
+    Velocity proxy mode or Paper direct mode
+  </Step>
+
+  <Step>
+    ##### Install the Plugin
+
+    Place JAR in appropriate `plugins/` directory
+  </Step>
+
+  <Step>
+    ##### Initial Configuration
+
+    Restart server to generate config, edit `plugins/NexAuth/config.conf`, restart again
+  </Step>
+
+  <Step>
+    ##### Configure Database
+
+    Choose SQLite (default) or external database
+  </Step>
+</Steps>
+
+## Next Steps
+
+After understanding which deployment mode is right for you:
+
+- 📖 [**Velocity Installation**](./velocity.mdx) - Detailed proxy setup
+- 📖 [**Paper Installation**](./paper.mdx) - Direct server setup
+- 📖 [**First Run Configuration**](./first-run.mdx) - Initial setup guide
+- 📖 [**Database Setup**](./database.mdx) - Database configuration options
+
+## Need Help?
+
+- Check the [troubleshooting guide](./velocity.mdx#troubleshooting) in the installation docs
+- Review the [API documentation](../../api-reference/introduction.mdx) for advanced integration
+- Visit our [GitHub repository](https://github.com/xreatlabs/NexAuth) for issues and discussions

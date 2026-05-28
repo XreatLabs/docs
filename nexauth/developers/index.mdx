@@ -1,0 +1,339 @@
+---
+title: "Developer Documentation"
+description: "Technical documentation for developers working with NexAuth"
+icon: 'code'
+---
+
+# NexAuth Developer Documentation
+
+Technical documentation for developers building with NexAuth, creating integrations, or contributing to the project.
+
+## Getting Started
+
+<Steps>
+<Step title="Prerequisites">
+Before developing with NexAuth, ensure you have:
+
+- Java 17 or higher
+- Maven 3.6+ or Gradle 7.0+
+- Git for version control
+- IDE (IntelliJ IDEA recommended)
+- Basic understanding of Minecraft server development
+
+</Step>
+
+<Step title="Clone Repository">
+Clone the NexAuth repository from GitHub.
+
+```bash
+git clone https://github.com/XreatLabs/NexAuth.git
+cd NexAuth
+```
+
+</Step>
+
+<Step title="Build Project">
+Build the project using Maven or Gradle.
+
+```bash
+# Using Maven
+./mvnw clean install
+
+# Using Gradle
+./gradlew clean build
+```
+
+</Step>
+
+<Step title="Explore Codebase">
+Familiarize yourself with the project structure and key components.
+
+[Explore architecture →](/nexauth/developers/architecture)
+
+</Step>
+</Steps>
+
+## Documentation
+
+<Columns cols={2}>
+<Card
+  title="Architecture"
+  icon="building"
+  href="/nexauth/developers/architecture"
+>
+Understand NexAuth's internal architecture, design patterns, and component organization.
+</Card>
+
+<Card
+  title="Building"
+  icon="hammer"
+  href="/nexauth/developers/building"
+>
+Complete build guide for compiling, testing, and packaging NexAuth.
+</Card>
+
+<Card
+  title="Contributing"
+  icon="users"
+  href="/nexauth/developers/contributing"
+>
+Guidelines for contributing code, reporting issues, and submitting pull requests.
+</Card>
+
+<Card
+  title="Platform Support"
+  icon="layers"
+  href="/nexauth/developers/platforms"
+>
+Technical details about multiplatform support and platform-specific implementations.
+</Card>
+</Columns>
+
+## Integration Guides
+
+<Card
+  title="API Reference"
+  icon="book"
+  href="/nexauth/api/overview"
+>
+Complete API documentation for integrating NexAuth with your plugins and applications.
+</Card>
+
+<AccordionGroup>
+<Accordion title="Event System">
+
+NexAuth provides a comprehensive event system for reacting to authentication events:
+
+```java
+@EventHandler
+public void onPlayerLogin(PlayerLoginEvent event) {
+    // Handle player login
+}
+
+@EventHandler  
+public void onPlayerRegister(PlayerRegisterEvent event) {
+    // Handle player registration
+}
+```
+
+[View event documentation →](/nexauth/api/events)
+
+</Accordion>
+
+<Accordion title="Provider API">
+
+Create custom authentication providers for specialized use cases:
+
+```java
+public class CustomAuthProvider implements AuthProvider {
+    @Override
+    public AuthResult authenticate(String username, String password) {
+        // Custom authentication logic
+    }
+}
+```
+
+[View provider documentation →](/nexauth/api/providers)
+
+</Accordion>
+
+<Accordion title="Database Integration">
+
+NexAuth supports multiple database backends through its abstraction layer:
+
+- **MySQL/MariaDB** - Recommended for production
+- **PostgreSQL** - Advanced features and performance
+- **H2** - Testing and development
+- **SQLite** - Lightweight embedded database
+
+[View database documentation →](/nexauth/api/database)
+
+</Accordion>
+</AccordionGroup>
+
+## Development Tools
+
+<Columns cols={2}>
+<Card
+  title="Testing Framework"
+  icon="check"
+>
+Comprehensive test suite with unit tests, integration tests, and mock server support.
+</Card>
+
+<Card
+  title="Debugging Tools"
+  icon="bug"
+>
+Built-in debugging tools, verbose logging, and development mode for easier troubleshooting.
+</Card>
+</Columns>
+
+## Specialized Topics
+
+<Card
+  title="Limbo Integration"
+  icon="ghost"
+  href="/nexauth/developers/limbo"
+>
+Advanced integration with Limbo servers for pre-authentication player handling and state management.
+</Card>
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Security Considerations">
+
+When developing with NexAuth:
+
+- **Never store plaintext passwords** - Always use the crypto utilities
+- **Validate all input** - Prevent injection attacks through proper validation
+- **Use parameterized queries** - Avoid SQL injection in database operations
+- **Follow principle of least privilege** - Minimize permissions for database users
+- **Keep dependencies updated** - Regularly update for security patches
+
+[View security documentation →](/nexauth/features/security)
+
+</Accordion>
+
+<Accordion title="Performance Guidelines">
+
+Optimize your integrations for performance:
+
+- **Use async operations** - Don't block the main server thread
+- **Implement caching** - Cache frequently accessed data
+- **Batch database operations** - Reduce database round trips
+- **Profile and test** - Use profiling tools to identify bottlenecks
+- **Monitor resource usage** - Track memory and CPU usage
+
+</Accordion>
+
+<Accordion title="Code Style">
+
+Follow our coding standards:
+
+- **Java code conventions** - Follow standard Java naming and formatting
+- **Javadoc comments** - Document public APIs with Javadoc
+- **Meaningful names** - Use descriptive variable and method names
+- **Small methods** - Keep methods focused and concise
+- **Error handling** - Proper exception handling and logging
+
+</Accordion>
+</AccordionGroup>
+
+## Contributing
+
+We welcome contributions from the community! Here's how to get involved:
+
+<Steps>
+<Step title="Check Existing Issues">
+Browse [GitHub Issues](https://github.com/XreatLabs/NexAuth/issues) to find open issues or feature requests.
+
+</Step>
+
+<Step title="Fork and Branch">
+Fork the repository and create a feature branch for your changes.
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+</Step>
+
+<Step title="Make Changes">
+Implement your changes following our [contributing guidelines](/nexauth/developers/contributing).
+
+</Step>
+
+<Step title="Test Thoroughly">
+Ensure all tests pass and add new tests for your features.
+
+```bash
+./mvnw clean test
+```
+
+</Step>
+
+<Step title="Submit Pull Request">
+Create a pull request with a clear description of your changes.
+
+</Step>
+</Steps>
+
+## Resources
+
+<Columns cols={2}>
+<Card
+  title="Source Code"
+  icon="github"
+  href="https://github.com/XreatLabs/NexAuth"
+>
+Browse the source code on GitHub.
+</Card>
+
+<Card
+  title="Issue Tracker"
+  icon="alert-circle"
+  href="https://github.com/XreatLabs/NexAuth/issues"
+>
+Report bugs and request features.
+</Card>
+
+<Card
+  title="Discussions"
+  icon="message-square"
+  href="https://github.com/XreatLabs/NexAuth/discussions"
+>
+Join community discussions and ask questions.
+</Card>
+
+<Card
+  title="CI/CD Pipeline"
+  icon="workflow"
+  href="https://github.com/XreatLabs/NexAuth/actions"
+>
+View build and test status on GitHub Actions.
+</Card>
+</Columns>
+
+## Support
+
+<AccordionGroup>
+<Accordion title="Getting Help">
+
+If you need help with development:
+
+1. **Check documentation** - Review existing docs first
+2. **Search issues** - See if your question has been answered
+3. **Ask in discussions** - Post your question in GitHub Discussions
+4. **Join Discord** - Connect with other developers (coming soon)
+5. **Create issue** - Report bugs or feature requests
+
+</Accordion>
+
+<Accordion title="Reporting Bugs">
+
+When reporting bugs, include:
+
+- **NexAuth version** - The specific version you're using
+- **Platform and version** - Velocity/Paper version
+- **Java version** - Output of `java -version`
+- **Steps to reproduce** - Clear reproduction steps
+- **Expected vs actual** - What you expected vs what happened
+- **Error logs** - Relevant server logs and stack traces
+- **Configuration** - Sanitized configuration files
+
+</Accordion>
+</AccordionGroup>
+
+## License
+
+NexAuth is released under the [MIT License](https://github.com/XreatLabs/NexAuth/blob/main/LICENSE). Contributions are accepted under the same license.
+
+<Card
+  title="Ready to contribute?"
+  icon="rocket"
+  href="https://github.com/XreatLabs/NexAuth/blob/main/CONTRIBUTING.md"
+>
+Read our full contribution guidelines and start contributing today.
+</Card>

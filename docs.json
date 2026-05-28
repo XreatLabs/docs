@@ -38,7 +38,62 @@
           {
             "group": "Overview",
             "pages": [
-              "nexauth/index"
+              "nexauth/index",
+              "nexauth/getting-started",
+              "nexauth/features"
+            ]
+          },
+          {
+            "group": "Installation",
+            "pages": [
+              "nexauth/installation/velocity",
+              "nexauth/installation/paper",
+              "nexauth/installation/database",
+              "nexauth/installation/first-run"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "nexauth/features/premium",
+              "nexauth/features/offline",
+              "nexauth/features/totp",
+              "nexauth/features/sessions",
+              "nexauth/features/bedrock",
+              "nexauth/features/security"
+            ]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "nexauth/commands/auth",
+              "nexauth/commands/account",
+              "nexauth/commands/2fa",
+              "nexauth/commands/premium",
+              "nexauth/commands/admin",
+              "nexauth/commands/permissions"
+            ]
+          },
+          {
+            "group": "For Developers",
+            "pages": [
+              "nexauth/developers/index",
+              "nexauth/developers/architecture",
+              "nexauth/developers/building",
+              "nexauth/developers/contributing",
+              "nexauth/developers/platforms",
+              "nexauth/developers/limbo"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": [
+              "nexauth/api/overview",
+              "nexauth/api/providers",
+              "nexauth/api/database",
+              "nexauth/api/crypto",
+              "nexauth/api/events",
+              "nexauth/api/integrations"
             ]
           }
         ]

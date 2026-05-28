@@ -1,0 +1,424 @@
+---
+title: Database Setup
+description: Configure SQLite, MySQL, and PostgreSQL databases for NexAuth
+---
+
+# Database Setup
+
+NexAuth supports multiple database backends. Choose the one that best fits your server size and infrastructure.
+
+## Supported Database Types
+
+| Database | Best For | Setup Complexity | Performance |
+|----------|----------|------------------|-------------|
+| SQLite | Small servers, development | Easy | Good for small scale |
+| MySQL/MariaDB | Medium to large servers | Medium | Excellent performance |
+| PostgreSQL | Large servers, enterprises | Medium | Excellent performance |
+
+<Tabs>
+  <Tab label="SQLite">
+    Perfect for small servers and development setups. No additional services required.
+
+    ### Configuration
+
+    ```hocon
+    database {
+        type=nexauth-sqlite
+        properties {
+            sqlite {
+                path="user-data.db"
+            }
+        }
+    }
+    ```
+
+    ### Database Location
+
+    The database file will be created at:
+    - **Linux**: `/path/to/server/plugins/NexAuth/nexauth.db`
+    - **Windows**: `\path\to\server\plugins\NexAuth\nexauth.db`
+
+    ### Advantages
+    - ✅ No setup required
+    - ✅ No additional services
+    - ✅ Easy to backup (just copy the .db file)
+    - ✅ Good for small servers (< 100 players)
+
+    ### Disadvantages
+    - ❌ Not recommended for large servers
+    - ❌ Single file can become fragmented
+    - ❌ No concurrent connection optimization
+
+    <Callout type="info">
+      SQLite is perfect for development, testing, and small production servers with less than 100 concurrent players.
+    </Callout>
+  </Tab>
+
+  <Tab label="MySQL/MariaDB">
+    Recommended for medium to large servers and production environments.
+
+    ### Prerequisites
+
+    - MySQL 5.7+ or MariaDB 10.2+
+    - Database user with CREATE and TABLE permissions
+
+    ### Installation
+
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt update
+    sudo apt install mysql-server
+    sudo systemctl start mysql
+    sudo systemctl enable mysql
+    ```
+
+    **CentOS/RHEL:**
+    ```bash
+    sudo yum install mariadb-server
+    sudo systemctl start mariadb
+    sudo systemctl enable mariadb
+    ```
+
+    ### Database Setup
+
+    <Steps>
+      <Step>
+        ##### Create database and user
+
+        ```sql
+        CREATE DATABASE nexauth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE USER 'nexauth_user'@'localhost' IDENTIFIED BY 'your_secure_password';
+        GRANT ALL PRIVILEGES ON nexauth.* TO 'nexauth_user'@'localhost';
+        FLUSH PRIVILEGES;
+        ```
+      </Step>
+
+      <Step>
+        ##### Test connection
+
+        ```bash
+        mysql -u nexauth_user -p nexauth
+        # Enter password when prompted
+        ```
+      </Step>
+
+      <Step>
+        ##### Configure NexAuth
+
+        ```hocon
+        database {
+            type=nexauth-mysql
+            properties {
+                mysql {
+                    host="localhost"
+                    port=3306
+                    database="nexauth"
+                    user="nexauth_user"
+                    password="your_secure_password"
+                    max-life-time=600000
+                }
+            }
+            transient-retries=3
+            transient-retry-delay-ms=250
+        }
+        ```
+      </Step>
+    </Steps>
+
+    ### Connection Settings
+
+    | Setting | Recommended Value | Description |
+    |---------|------------------|-------------|
+    | max-life-time | 600000 | 10 minutes connection lifetime |
+    | transient-retries | 3 | Retry attempts for transient failures |
+    | transient-retry-delay-ms | 250 | Delay between retries in milliseconds |
+
+    <Callout type="tip">
+      For servers with 100+ concurrent players, ensure your MySQL/MariaDB server can handle the connection load.
+    </Callout>
+  </Tab>
+
+  <Tab label="PostgreSQL">
+    Recommended for enterprise environments and servers requiring advanced features.
+
+    ### Prerequisites
+
+    - PostgreSQL 12+
+    - Database user with CREATE privileges
+
+    ### Installation
+
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt update
+    sudo apt install postgresql postgresql-contrib
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    ```
+
+    **CentOS/RHEL:**
+    ```bash
+    sudo yum install postgresql-server postgresql-contrib
+    sudo postgresql-setup --initdb
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    ```
+
+    ### Database Setup
+
+    <Steps>
+      <Step>
+        ##### Create database and user
+
+        ```sql
+        -- Connect to PostgreSQL
+        sudo -u postgres psql
+
+        -- Create database and user
+        CREATE DATABASE nexauth;
+        CREATE USER nexauth_user WITH PASSWORD 'your_secure_password';
+        GRANT ALL PRIVILEGES ON DATABASE nexauth TO nexauth_user;
+        \q
+        ```
+      </Step>
+
+      <Step>
+        ##### Test connection
+
+        ```bash
+        psql -U nexauth_user -d nexauth
+        # Enter password when prompted
+        ```
+      </Step>
+
+      <Step>
+        ##### Configure NexAuth
+
+        ```hocon
+        database {
+            type=nexauth-postgresql
+            properties {
+                postgresql {
+                    host="localhost"
+                    port=5432
+                    database="nexauth"
+                    user="nexauth_user"
+                    password="your_secure_password"
+                    max-life-time=600000
+                }
+            }
+            transient-retries=3
+            transient-retry-delay-ms=250
+        }
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Database Migration
+
+### Migrating from SQLite to MySQL
+
+1. Stop your server
+2. Install MySQL and create database/user
+3. Modify your config to use MySQL
+4. Start server - NexAuth will automatically migrate data
+
+### Manual Migration (if needed)
+
+```sql
+-- Export from SQLite (using sqlite3 command line)
+sqlite3 nexauth.db ".dump" > nexauth_dump.sql
+
+-- Convert for MySQL (replace SQLite-specific syntax)
+sed 's/TEXT/TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci/g' nexauth_dump.sql > nexauth_mysql.sql
+
+-- Import to MySQL
+mysql -u nexauth_user -p nexauth < nexauth_mysql.sql
+```
+
+## Performance Optimization
+
+### MySQL/MariaDB Optimizations
+
+```sql
+-- Optimize for InnoDB
+ALTER TABLE nexauth_users ENGINE = InnoDB;
+ALTER TABLE nexauth_sessions ENGINE = InnoDB;
+ALTER TABLE nexauth_totp ENGINE = InnoDB;
+
+-- Add indexes for better performance
+CREATE INDEX idx_username ON nexauth_users(username);
+CREATE INDEX idx_uuid ON nexauth_users(uuid);
+CREATE INDEX idx_session_token ON nexauth_sessions(token);
+```
+
+### PostgreSQL Optimizations
+
+```sql
+-- Add indexes for better performance
+CREATE INDEX idx_users_username ON nexauth_users(username);
+CREATE INDEX idx_users_uuid ON nexauth_users(uuid);
+CREATE INDEX idx_sessions_token ON nexauth_sessions(token);
+
+-- Consider for very large tables
+ALTER TABLE nexauth_users SET (autovacuum_vacuum_scale_factor = 0.1);
+```
+
+## Backup Strategies
+
+<Tabs>
+  <Tab label="SQLite">
+    ```bash
+    # Simple copy
+    cp plugins/NexAuth/nexauth.db /path/to/backup/
+
+    # Or use sqlite3
+    sqlite3 plugins/NexAuth/nexauth.db ".backup /path/to/backup/nexauth-$(date +%Y%m%d).db"
+    ```
+  </Tab>
+
+  <Tab label="MySQL/MariaDB">
+    ```bash
+    # Daily backup
+    mysqldump -u nexauth_user -p nexauth > /path/to/backup/nexauth-$(date +%Y%m%d).sql
+
+    # With compression
+    mysqldump -u nexauth_user -p nexauth | gzip > /path/to/backup/nexauth-$(date +%Y%m%d).sql.gz
+    ```
+  </Tab>
+
+  <Tab label="PostgreSQL">
+    ```bash
+    # Daily backup
+    pg_dump -U nexauth_user -d nexauth > /path/to/backup/nexauth-$(date +%Y%m%d).sql
+
+    # With compression
+    pg_dump -U nexauth_user -d nexauth | gzip > /path/to/backup/nexauth-$(date +%Y%m%d).sql.gz
+    ```
+  </Tab>
+</Tabs>
+
+## Troubleshooting Database Issues
+
+### Common Connection Problems
+
+#### "Access Denied" Errors
+
+```sql
+-- Check MySQL user privileges
+SHOW GRANTS FOR 'nexauth_user'@'localhost';
+
+-- Or recreate user with proper permissions
+DROP USER 'nexauth_user'@'localhost';
+CREATE USER 'nexauth_user'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON nexauth.* TO 'nexauth_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+#### Database Connection Timeout
+
+- Check if database service is running
+- Verify connection details in config
+- Increase `connect-timeout` setting
+- Check firewall settings
+
+#### Table Not Found
+
+- Database might not be created yet
+- Check user has CREATE permissions
+- Look for error logs during startup
+
+### Performance Issues
+
+#### High CPU Usage
+
+- Increase connection pool size
+- Add more indexes
+- Check for slow queries
+- Consider SSD storage
+
+#### Memory Issues
+
+- Adjust connection pool size
+- Monitor database server memory usage
+- Consider database server upgrades
+
+## Connection Security
+
+### MySQL Security Recommendations
+
+```sql
+-- Create user with limited privileges
+CREATE USER 'nexauth_user'@'localhost' IDENTIFIED BY 'secure_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON nexauth.* TO 'nexauth_user'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Enable SSL for connections
+-- In my.cnf:
+[mysqld]
+require_secure_transport=ON
+ssl-ca=/path/to/ca.pem
+ssl-cert=/path/to/server-cert.pem
+ssl-key=/path/to/server-key.pem
+```
+
+### PostgreSQL Security Recommendations
+
+```sql
+-- Create user with limited privileges
+CREATE USER nexauth_user WITH PASSWORD 'secure_password';
+GRANT CONNECT ON DATABASE nexauth TO nexauth_user;
+GRANT USAGE ON SCHEMA public TO nexauth_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO nexauth_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nexauth_user;
+
+-- Enable SSL connections
+# In postgresql.conf:
+ssl = on
+ssl_cert_file = 'server.crt'
+ssl_key_file = 'server.key'
+```
+
+## Monitoring Database Health
+
+### MySQL/MariaDB Monitoring
+
+```bash
+# Check database status
+mysqladmin -u nexauth_user -p status
+
+# Monitor connections
+SHOW PROCESSLIST;
+SHOW STATUS LIKE 'Threads_connected';
+
+# Check table sizes
+SELECT table_name, ROUND(data_length/1024/1024, 2) AS size_mb
+FROM information_schema.tables
+WHERE table_schema = 'nexauth';
+```
+
+### PostgreSQL Monitoring
+
+```sql
+-- Check active connections
+SELECT count(*) FROM pg_stat_activity;
+
+-- Check database size
+SELECT pg_size_pretty(pg_database_size('nexauth'));
+
+-- Check table sizes
+SELECT table_name, pg_size_pretty(pg_total_relation_size('tablename'))
+FROM pg_tables
+WHERE schemaname = 'public';
+```
+
+## Next Steps
+
+After setting up your database:
+
+- 📖 [First Run Configuration](./first-run.mdx) for initial plugin setup
+- 📖 [Installation Guides](./overview.mdx) for deployment options
+- 📖 Performance optimization for your specific use case
+- 📖 Advanced database configurations (coming soon)

@@ -1,0 +1,255 @@
+---
+title: Paper/Purpur Installation
+description: Step-by-step guide for installing NexAuth directly on Paper and Purpur servers
+---
+
+# Paper/Purpur Installation
+
+This guide walks you through installing NexAuth directly on your Paper or Purpur server for single-server authentication.
+
+## Prerequisites
+
+- Java 21 or newer
+- Paper 1.20+ or Purpur
+- Administrative access to server files
+- Server must run in offline mode
+
+## Installation Steps
+
+<Steps>
+  <Step>
+    ##### Download or Build NexAuth
+
+    Choose one of these methods:
+
+    **Option A: Download from Releases**
+
+    Download the latest `NexAuth.jar` from the [GitHub Releases](https://github.com/xreatlabs/NexAuth/releases)
+
+    <Callout type="info">
+      A single `NexAuth.jar` works on both Paper/Purpur servers and Velocity proxies - no separate files needed.
+    </Callout>
+
+    **Option B: Build from Source**
+
+    ```bash
+    # Clone the repository
+    git clone https://github.com/xreatlabs/NexAuth.git
+    cd NexAuth
+
+    # Build the plugin
+    ./gradlew :Plugin:shadowJar
+    ```
+
+    The JAR will be available at `Plugin/build/libs/NexAuth.jar`
+  </Step>
+
+  <Step>
+    ##### Configure Server Properties
+
+    Before installing, ensure your server runs in offline mode:
+
+    Edit `server.properties`:
+    ```properties
+    online-mode=false
+    motd=NexAuth Server
+    server-port=25565
+    ```
+
+    <Callout type="warning">
+      Setting `online-mode=false` is required for NexAuth to function properly.
+    </Callout>
+  </Step>
+
+  <Step>
+    ##### Install on Paper/Purpur
+
+    1. Stop your Paper/Purpur server
+    2. Navigate to the `plugins/` directory
+    3. Copy `NexAuth.jar` into the `plugins/` directory
+    4. Start your Paper/Purpur server
+  </Step>
+
+  <Step>
+    ##### Initial Configuration Generation
+
+    After first startup:
+
+    1. The plugin will generate a configuration file at `plugins/NexAuth/config.conf`
+    2. The server will automatically shut down after generating the config
+    3. This is normal behavior - we'll configure it in the next step
+
+    <Callout type="info">
+      This automatic shutdown is expected behavior. The plugin needs to generate the default configuration before running.
+    </Callout>
+  </Step>
+
+  <Step>
+    ##### Edit Configuration
+
+    Edit `plugins/NexAuth/config.conf` with your preferred settings:
+
+    ```hocon
+    # Example basic configuration for Paper mode
+    database {
+        type=nexauth-sqlite
+        properties {
+            sqlite {
+                path="user-data.db"
+            }
+        }
+    }
+    
+    # Premium authentication
+    auto-register=false
+    profile-conflict-resolution-strategy=BLOCK
+    
+    # Security settings
+    default-crypto-provider=BCrypt-2A
+    hide-player-inventory=true
+    ```
+  </Step>
+
+  <Step>
+    ##### Restart and Verify
+
+    1. Start your Paper/Purpur server again
+    2. Test authentication with both:
+       - Premium accounts (auto-login)
+       - Offline accounts (registration required)
+    3. Check the logs for any errors
+  </Step>
+</Steps>
+
+## Configuration Reference
+
+### Key Settings for Paper Mode
+
+```hocon
+# Database configuration
+database {
+    type=nexauth-sqlite
+    properties {
+        sqlite {
+            path="user-data.db"
+        }
+    }
+}
+
+# Premium authentication
+auto-register=false
+profile-conflict-resolution-strategy=BLOCK
+default-crypto-provider=BCrypt-2A
+
+# Security settings
+max-login-attempts=-1
+milliseconds-to-refresh-login-attempts=10000
+hide-player-inventory=true
+
+# Session management
+session-timeout=604800
+
+# UI settings
+use-titles=true
+use-action-bar=false
+
+# Server configuration (worlds on Paper)
+limbo=["limbo_world"]
+lobby {
+    root=["world", "lobby"]
+}
+```
+
+### Paper-Specific Features
+
+#### Inventory Hiding
+
+NexAuth can hide player inventories during authentication:
+```hocon
+hide-player-inventory=true
+```
+
+#### Protocol Support
+
+For Bedrock players via Geyser/Floodgate:
+```hocon
+new-uuid-creator=CRACKED
+profile-conflict-resolution-strategy=BLOCK
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Plugin generates config then shuts down
+
+This is normal behavior. Edit the config file and restart the server.
+
+#### Players getting kicked immediately on join
+
+- Ensure `online-mode=false` in `server.properties`
+- Check that no other authentication plugins are installed
+- Verify the configuration is correct
+
+#### Inventory hiding not working
+
+- Ensure `hide-player-inventory=true` in config
+- Check for conflicts with other inventory plugins
+- Verify you're using Paper/Purpur (not Spigot)
+
+#### Performance issues
+
+- Consider using MySQL instead of SQLite for larger servers
+- Adjust `register-delay` if experiencing lag
+- Check server resources
+
+### Log Locations
+
+- **Paper/Purpur**: `/path/to/server/logs/`
+- **NexAuth Logs**: Included in server logs
+
+### Performance Tips
+
+#### For Large Servers
+
+```hocon
+# Use MySQL instead of SQLite
+database {
+    type=nexauth-mysql
+    properties {
+        mysql {
+            host="localhost"
+            port=3306
+            database="nexauth"
+            user="nexauth"
+            password="yourpassword"
+        }
+    }
+    transient-retries=3
+    transient-retry-delay-ms=250
+}
+```
+
+#### For Bedrock Players
+
+```hocon
+# Geyser/Floodgate support
+new-uuid-creator=CRACKED
+profile-conflict-resolution-strategy=BLOCK
+```
+
+## Comparison: Paper vs Velocity Mode
+
+| Feature | Paper Mode | Velocity Mode |
+|---------|------------|---------------|
+| Installation | Direct on server | On proxy only |
+| Backend Security | Server exposed to internet | Backend servers protected |
+| Multi-Server | Single server only | Multiple servers supported |
+| Setup Complexity | Simple | Requires proxy configuration |
+| Performance | Direct | Slight overhead from proxy |
+
+## Next Steps
+
+- 📖 Configure your [database](./database.mdx) for better performance
+- 📖 Enable [TOTP two-factor authentication](../features/totp.mdx) (coming soon)
+- 📖 Learn about [advanced configuration](../advanced/config-reference.mdx) (coming soon)

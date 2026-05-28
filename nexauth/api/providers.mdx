@@ -1,0 +1,316 @@
+---
+title: "Authentication Providers"
+description: "Custom authentication providers for specialized authentication needs"
+icon: 'cogs'
+---
+
+# Authentication Providers
+
+NexAuth's provider system allows you to create custom authentication providers for specialized authentication needs.
+
+## Provider Interface
+
+### Basic Provider
+
+```java
+public interface AuthProvider {
+    /**
+     * Authenticate a player with given credentials
+     */
+    AuthResult authenticate(String username, String password);
+    
+    /**
+     * Register a new account
+     */
+    AuthResult register(String username, String password);
+    
+    /**
+     * Check if username is premium
+     */
+    boolean isPremium(String username);
+    
+    /**
+     * Get UUID for username
+     */
+    UUID getUUID(String username);
+    
+    /**
+     * Get provider name
+     */
+    String getName();
+}
+```
+
+## Built-in Providers
+
+### PremiumAuthProvider
+
+Handles Minecraft premium authentication:
+
+```java
+PremiumAuthProvider provider = new PremiumAuthProvider(sessionServer);
+
+// Authenticate premium player
+AuthResult result = provider.authenticate(username, null);
+
+if (result.isSuccess()) {
+    UUID premiumUUID = result.getUUID();
+    // Handle premium authentication
+}
+```
+
+### OfflineAuthProvider
+
+Handles offline/cracked authentication:
+
+```java
+OfflineAuthProvider provider = new OfflineAuthProvider(database);
+
+// Authenticate with password
+AuthResult result = provider.authenticate(username, password);
+
+if (result.isSuccess()) {
+    // Handle offline authentication
+}
+```
+
+### FloodgateAuthProvider
+
+Handles Bedrock player authentication:
+
+```java
+FloodgateAuthProvider provider = new FloodgateAuthProvider(floodgate);
+
+// Authenticate Bedrock player
+AuthResult result = provider.authenticate(username, floodgateUUID);
+
+if (result.isSuccess()) {
+    // Handle Bedrock authentication
+}
+```
+
+## Custom Providers
+
+### Creating Custom Provider
+
+```java
+public class CustomAuthProvider implements AuthProvider {
+    private final CustomAuthService service;
+    
+    public CustomAuthProvider(CustomAuthService service) {
+        this.service = service;
+    }
+    
+    @Override
+    public AuthResult authenticate(String username, String password) {
+        try {
+            // Call custom authentication service
+            boolean valid = service.authenticate(username, password);
+            
+            if (valid) {
+                return AuthResult.success()
+                    .withUUID(service.getUUID(username))
+                    .withPremium(service.isPremium(username));
+            } else {
+                return AuthResult.failure("Invalid credentials");
+            }
+        } catch (Exception e) {
+            return AuthResult.failure("Authentication error: " + e.getMessage());
+        }
+    }
+    
+    @Override
+    public AuthResult register(String username, String password) {
+        if (service.userExists(username)) {
+            return AuthResult.failure("User already exists");
+        }
+        
+        boolean created = service.createUser(username, password);
+        return created ? 
+            AuthResult.success() : 
+            AuthResult.failure("Failed to create user");
+    }
+    
+    @Override
+    public boolean isPremium(String username) {
+        return service.isPremium(username);
+    }
+    
+    @Override
+    public UUID getUUID(String username) {
+        return service.getUUID(username);
+    }
+    
+    @Override
+    public String getName() {
+        return "custom";
+    }
+}
+```
+
+### Registering Custom Provider
+
+```java
+// Create provider instance
+CustomAuthProvider provider = new CustomAuthProvider(customService);
+
+// Register with NexAuth
+NexAuthAPI api = NexAuthAPI.getInstance();
+api.registerProvider("custom", provider);
+
+// Set as default provider (optional)
+api.setDefaultProvider("custom");
+```
+
+## Provider Configuration
+
+### Provider Priority
+
+NexAuth automatically handles provider priority:
+1. Premium accounts (Mojang authentication)
+2. Offline accounts (password authentication)
+3. Floodgate accounts (Bedrock players)
+
+No manual provider configuration is required.
+
+### Dynamic Provider Loading
+
+```java
+// Load provider from configuration
+String providerClass = config.getString("providers.custom.class");
+AuthProvider provider = (AuthProvider) Class
+    .forName(providerClass)
+    .getDeclaredConstructor()
+    .newInstance();
+
+// Configure provider
+if (provider instanceof Configurable) {
+    ((Configurable) provider).configure(config.getSection("providers.custom.settings"));
+}
+
+// Register provider
+api.registerProvider("custom", provider);
+```
+
+## Advanced Features
+
+### Provider Chaining
+
+```java
+// Chain multiple providers
+ChainedAuthProvider chainedProvider = new ChainedAuthProvider();
+chainedProvider.addProvider(new PremiumAuthProvider());
+chainedProvider.addProvider(new OfflineAuthProvider());
+chainedProvider.addProvider(new CustomAuthProvider());
+
+// Try each provider in order
+AuthResult result = chainedProvider.authenticate(username, password);
+
+if (result.isSuccess()) {
+    String providerName = result.getProviderName();
+    // Handle successful authentication
+}
+```
+
+### Provider Decorators
+
+```java
+// Add caching to provider
+CachingAuthProvider cachedProvider = new CachingAuthProvider(
+    new CustomAuthService(),
+    Caffeine.newBuilder()
+        .expireAfterWrite(5, TimeUnit.MINUTES)
+        .maximumSize(1000)
+        .build()
+);
+
+// Add logging
+LoggingAuthProvider loggingProvider = new LoggingAuthProvider(
+    cachedProvider,
+    logger
+);
+
+// Add rate limiting
+RateLimitedAuthProvider rateLimitedProvider = new RateLimitedAuthProvider(
+    loggingProvider,
+    RateLimiter.create(10, TimeUnit.MINUTES)
+);
+```
+
+## Error Handling
+
+### Provider Errors
+
+```java
+try {
+    AuthResult result = provider.authenticate(username, password);
+    
+    if (result.isSuccess()) {
+        // Success
+    } else {
+        // Handle specific errors
+        switch (result.getErrorType()) {
+            case INVALID_CREDENTIALS:
+                // Handle invalid credentials
+                break;
+            case ACCOUNT_LOCKED:
+                // Handle locked account
+                break;
+            case PROVIDER_ERROR:
+                // Handle provider error
+                break;
+        }
+    }
+} catch (ProviderException e) {
+    // Handle provider-specific exceptions
+    logger.error("Provider error: " + e.getMessage());
+}
+```
+
+## Testing
+
+### Mock Provider for Testing
+
+```java
+public class MockAuthProvider implements AuthProvider {
+    private final Map<String, String> users = new HashMap<>();
+    
+    public MockAuthProvider() {
+        // Add test users
+        users.put("testuser", "password");
+    }
+    
+    @Override
+    public AuthResult authenticate(String username, String password) {
+        String storedPassword = users.get(username);
+        if (storedPassword != null && storedPassword.equals(password)) {
+            return AuthResult.success();
+        }
+        return AuthResult.failure("Invalid credentials");
+    }
+    
+    // Implement other methods...
+}
+
+// Use in tests
+MockAuthProvider mockProvider = new MockAuthProvider();
+api.registerProvider("mock", mockProvider);
+api.setDefaultProvider("mock");
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Handle exceptions gracefully
+- ✅ Log authentication attempts
+- ✅ Implement proper error handling
+- ✅ Thread-safe implementation
+- ✅ Efficient database operations
+- ✅ Proper input validation
+</Checklist>
+
+## Next Steps
+
+<Card title="Database API" icon="database" href="/nexauth/api/database">
+Database integration and abstraction layer.
+</Card>

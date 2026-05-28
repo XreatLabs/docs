@@ -1,0 +1,262 @@
+---
+title: "Features Overview"
+description: "Comprehensive overview of NexAuth authentication features"
+icon: 'star'
+---
+
+# NexAuth Features
+
+NexAuth provides enterprise-grade authentication features for Minecraft servers with multiplatform support and advanced security capabilities.
+
+## Core Features
+
+<Columns cols={3}>
+<Card
+  title="Multiplatform Support"
+  icon="layers"
+  href="/nexauth/installation/velocity"
+>
+Works seamlessly across Velocity proxies and Paper servers with unified authentication.
+</Card>
+
+<Card
+  title="Secure Authentication"
+  icon="shield"
+  href="/nexauth/features/security"
+>
+Advanced security with encryption, session management, and attack prevention.
+</Card>
+
+<Card
+  title="Premium Account Support"
+  icon="crown"
+  href="/nexauth/features/premium"
+>
+Automatic premium account authentication with optional offline mode support.
+</Card>
+</Columns>
+
+## Advanced Security
+
+<AccordionGroup>
+<Accordion title="Session Management">
+
+NexAuth implements intelligent session management to balance security and user convenience:
+
+- **Configurable session duration** - Control how long players remain logged in
+- **IP-based session validation** - Optional IP binding for enhanced security
+- **Cross-server sessions** - Unified authentication across multiple servers
+- **Secure session storage** - Encrypted session data in the database
+
+[Learn more about sessions →](/nexauth/features/sessions)
+
+</Accordion>
+
+<Accordion title="Two-Factor Authentication">
+
+Add an extra layer of security with TOTP-based 2FA:
+
+- **TOTP support** - Compatible with Google Authenticator, Authy, etc.
+- **QR code setup** - Easy 2FA enrollment with QR code generation
+- **Backup codes** - Recovery codes for account access
+- **Optional enforcement** - Require 2FA for specific player groups
+
+[Learn about 2FA →](/nexauth/features/totp)
+
+</Accordion>
+
+<Accordion title="Premium Account Integration">
+
+Seamless integration with Minecraft's premium authentication:
+
+- **Automatic premium login** - No password needed for premium players
+- **Mixed mode support** - Premium and cracked players together
+- **Skin loading** - Proper skin handling for all player types
+- **Fallback authentication** - Graceful handling of auth service outages
+
+[Learn about premium →](/nexauth/features/premium)
+
+</Accordion>
+
+<Accordion title="Offline Mode Support">
+
+Full-featured authentication for offline/cracked servers:
+
+- **Secure password hashing** - Industry-standard bcrypt with salt
+- **Password strength requirements** - Configurable complexity rules
+- **Account recovery** - Admin tools for account management
+- **Migration support** - Import from other auth plugins
+
+[Learn about offline mode →](/nexauth/features/offline)
+
+</Accordion>
+</AccordionGroup>
+
+## Platform Integration
+
+<Columns cols={2}>
+<Card
+  title="Bedrock Edition Support"
+  icon="mobile"
+  href="/nexauth/features/bedrock"
+>
+Native support for Bedrock players via Floodgate with proper authentication handling.
+</Card>
+
+<Card
+  title="Limbo Integration"
+  icon="ghost"
+  href="/nexauth/developers/limbo"
+>
+Limbo server integration for pre-authentication player handling.
+</Card>
+</Columns>
+
+## Developer Features
+
+<AccordionGroup>
+<Accordion title="Extensible API">
+
+Build custom integrations with NexAuth's comprehensive API:
+
+- **Event system** - React to authentication events
+- **Provider API** - Custom authentication providers
+- **Database abstraction** - Support for multiple database backends
+- **Crypto utilities** - Hashing and encryption utilities
+
+[Explore API docs →](/nexauth/api/overview)
+
+</Accordion>
+
+<Accordion title="Plugin Integration">
+
+Integrate NexAuth with your existing plugins:
+
+- **Vault integration** - Economy and permissions support
+- **PlaceholderAPI support** - Dynamic placeholders for auth status
+- **ProtocolLib compatibility** - Advanced packet handling
+- **BungeeCord/Velocity messaging** - Cross-server communication
+
+[View integrations →](/nexauth/api/integrations)
+
+</Accordion>
+</AccordionGroup>
+
+## Security Features
+
+<Card
+  title="Enterprise Security"
+  icon="lock"
+  href="/nexauth/features/security"
+>
+
+NexAuth implements multiple security measures to protect player accounts:
+
+- **Brute force protection** - Rate limiting and account lockouts
+- **SQL injection prevention** - Parameterized database queries
+- **Password hashing** - bcrypt with adaptive work factor
+- **Session hijacking prevention** - IP validation and secure cookies
+- **Encryption at rest** - Sensitive data encrypted in database
+- **Audit logging** - Comprehensive authentication event logging
+
+</Card>
+
+## Performance & Scalability
+
+<Columns cols={2}>
+<Card
+  title="High Performance"
+  icon="zap"
+>
+Optimized for large servers with concurrent player handling, database connection pooling, and async operations.
+</Card>
+
+<Card
+  title="Cloud Native"
+  icon="cloud"
+>
+Designed for modern infrastructure with support for containerized deployments and cloud databases.
+</Card>
+</Columns>
+
+## Feature Comparison
+
+<Table>
+  <TableHead>
+    <TableRow>
+      <TableHeadCell>Feature</TableHeadCell>
+      <TableHeadCell>NexAuth</TableHeadCell>
+      <TableHeadCell>Other Plugins</TableHeadCell>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    <TableRow>
+      <TableCell>Multiplatform Support</TableCell>
+      <TableCell>✅ Velocity + Paper</TableCell>
+      <TableCell>❌ Platform-specific</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Premium Auth</TableCell>
+      <TableCell>✅ Built-in</TableCell>
+      <TableCell>⚠️ Partial/Plugin-based</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>2FA/TOTP</TableCell>
+      <TableCell>✅ Native support</TableCell>
+      <TableCell>❌ Rare</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Bedrock Support</TableCell>
+      <TableCell>✅ Floodgate integration</TableCell>
+      <TableCell>❌ Limited</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Modern Security</TableCell>
+      <TableCell>✅ bcrypt, encryption</TableCell>
+      <TableCell>⚠️ Legacy hashing</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Developer API</TableCell>
+      <TableCell>✅ Comprehensive</TableCell>
+      <TableCell>⚠️ Basic</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+
+## Roadmap
+
+<AccordionGroup>
+<Accordion title="Planned Features">
+
+We're continuously improving NexAuth. Here's what's coming:
+
+- **Web dashboard** - Browser-based account management
+- **OAuth integration** - Support for external OAuth providers
+- **Biometric auth** - WebAuthn support for passwordless login
+- **Advanced analytics** - Authentication metrics and reporting
+- **Cloud backup** - Secure cloud-based account data sync
+
+Have a feature request? [Open an issue on GitHub](https://github.com/XreatLabs/NexAuth/issues).
+
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<Columns cols={2}>
+<Card
+  title="Installation Guide"
+  icon="download"
+  href="/nexauth/getting-started"
+>
+Get started with NexAuth installation and setup.
+</Card>
+
+<Card
+  title="Command Reference"
+  icon="terminal"
+  href="/nexauth/commands/auth"
+>
+Learn about all available commands for players and administrators.
+</Card>
+</Columns>

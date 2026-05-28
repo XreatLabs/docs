@@ -1,0 +1,319 @@
+---
+title: "Cryptography API"
+description: "Security utilities for encryption, hashing, and secure data handling"
+icon: 'lock'
+---
+
+# Cryptography API
+
+NexAuth provides comprehensive cryptography utilities for secure password storage, data encryption, and cryptographic operations.
+
+## Password Hashing
+
+### Bcrypt Hashing
+
+```java
+CryptoService crypto = NexAuthAPI.getInstance().getCryptoService();
+
+// Hash password
+String hashedPassword = crypto.hashPassword("myPassword123");
+
+// Verify password
+boolean matches = crypto.verifyPassword("myPassword123", hashedPassword);
+
+if (matches) {
+    // Password is correct
+}
+```
+
+### Custom Work Factor
+
+```java
+// Hash with custom cost factor (4-31, default 12)
+String hashedPassword = crypto.hashPassword("password", 14);
+
+// Higher cost = more secure but slower
+// Cost 12 = ~300ms on modern hardware
+// Cost 14 = ~1.2s on modern hardware
+```
+
+### Password Migration
+
+```java
+// Migrate from old hash to new hash
+String oldHash = "old_algorithm_hash";
+String newPassword = "userInput";
+
+if (crypto.isLegacyHash(oldHash)) {
+    // Verify with old algorithm
+    if (crypto.verifyLegacy(newPassword, oldHash)) {
+        // Rehash with bcrypt
+        String newHash = crypto.hashPassword(newPassword);
+        // Save new hash to database
+    }
+}
+```
+
+## Data Encryption
+
+### AES Encryption
+
+```java
+// Encrypt sensitive data
+String plaintext = "sensitive data";
+String encrypted = crypto.encrypt(plaintext);
+
+// Decrypt data
+String decrypted = crypto.decrypt(encrypted);
+
+// Encrypt with custom key
+String key = crypto.generateKey();
+String encrypted = crypto.encrypt(plaintext, key);
+String decrypted = crypto.decrypt(encrypted, key);
+```
+
+### File Encryption
+
+```java
+// Encrypt file
+File inputFile = new File("data.txt");
+File outputFile = new File("data.enc");
+crypto.encryptFile(inputFile, outputFile);
+
+// Decrypt file
+File encryptedFile = new File("data.enc");
+File decryptedFile = new File("data_decrypted.txt");
+crypto.decryptFile(encryptedFile, decryptedFile);
+```
+
+## Secure Random
+
+### Generate Random Data
+
+```java
+// Generate random bytes
+byte[] randomBytes = crypto.generateRandomBytes(32);
+
+// Generate random string
+String randomString = crypto.generateRandomString(16);
+
+// Generate random password
+String password = crypto.generatePassword(12, true, true, true);
+```
+
+### TOTP Secret Generation
+
+```java
+// Generate TOTP secret
+String secret = crypto.generateTOTPSecret();
+
+// Generate backup codes
+List<String> backupCodes = crypto.generateBackupCodes(10);
+
+// Verify TOTP code
+boolean valid = crypto.verifyTOTPCode(secret, "123456");
+```
+
+## Hash Functions
+
+### Data Hashing
+
+```java
+// SHA-256 hash
+String hash = crypto.sha256("data to hash");
+
+// SHA-512 hash
+String hash = crypto.sha512("data to hash");
+
+// MD5 hash (not recommended for security)
+String hash = crypto.md5("data to hash");
+```
+
+### File Hashing
+
+```java
+// Hash file
+File file = new File("data.txt");
+String hash = crypto.sha256File(file);
+```
+
+## Key Derivation
+
+### PBKDF2 Key Derivation
+
+```java
+// Derive key from password
+String password = "myPassword";
+byte[] salt = crypto.generateRandomBytes(16);
+byte[] key = crypto.deriveKey(password, salt, 10000, 256);
+```
+
+### HMAC
+
+```java
+// HMAC-SHA256
+String hmac = crypto.hmac256("key", "message");
+
+// HMAC-SHA512
+String hmac = crypto.hmac512("key", "message");
+```
+
+## Security Utilities
+
+### Secure String Handling
+
+```java
+// Create secure string (erases from memory when done)
+try (SecureString secure = new SecureString("sensitive data")) {
+    // Use secure string
+    char[] chars = secure.getChars();
+    // Process data...
+} // Secure string is automatically erased
+```
+
+### Password Validation
+
+```java
+// Validate password strength
+PasswordStrength strength = crypto.validatePassword("password123");
+
+if (strength.isStrong()) {
+    // Password is strong
+} else {
+    // Check requirements
+    if (!strength.hasMinLength()) {
+        // Password too short
+    }
+    if (!strength.hasUppercase()) {
+        // Missing uppercase letter
+    }
+    if (!strength.hasNumbers()) {
+        // Missing numbers
+    }
+}
+
+// Generate strong password
+String strongPassword = crypto.generateStrongPassword(16);
+```
+
+## Token Generation
+
+### JWT Tokens
+
+```java
+// Generate JWT token
+String token = crypto.generateJWTToken(
+    Map.of("user", "username", "exp", System.currentTimeMillis() + 3600000)
+);
+
+// Verify JWT token
+boolean valid = crypto.verifyJWTToken(token);
+
+// Decode JWT token
+Map<String, Object> claims = crypto.decodeJWTToken(token);
+```
+
+### API Tokens
+
+```java
+// Generate API token
+String token = crypto.generateApiToken();
+
+// Verify API token
+boolean valid = crypto.verifyApiToken(token);
+```
+
+## Best Practices
+
+### Password Storage
+
+```java
+// Always use bcrypt for passwords
+String hashed = crypto.hashPassword(password);
+
+// Never store plaintext passwords
+// Never use MD5 or SHA-1 for passwords
+
+// Use appropriate work factor
+int costFactor = 12; // Default, good balance
+int highSecurity = 14; // For admin accounts
+int lowSecurity = 10; // For test environments
+```
+
+### Data Encryption
+
+```java
+// Use AES-256 for data encryption
+String encrypted = crypto.encrypt(sensitiveData);
+
+// Store encryption key securely
+// Never hardcode keys in source code
+// Use environment variables or key management systems
+
+// Rotate keys periodically
+```
+
+### Random Generation
+
+```java
+// Use cryptographically secure random
+String random = crypto.generateRandomString(32);
+
+// Never use Math.random() for security
+// Never use java.util.Random for security
+
+// Generate sufficient length
+// Minimum 16 bytes for tokens
+// Minimum 32 bytes for API keys
+```
+
+## Security Considerations
+
+<Checklist>
+- ✅ Always use bcrypt for passwords
+- ✅ Use appropriate work factor (12+)
+- ✅ Never store plaintext passwords
+- ✅ Use HTTPS for data transmission
+- ✅ Store encryption keys securely
+- ✅ Rotate keys periodically
+- ✅ Use secure random for tokens
+- ✅ Implement rate limiting
+- ✅ Log security events
+- ✅ Regular security audits
+</Checklist>
+
+## Performance
+
+### Hash Performance
+
+```java
+// Bcrypt cost factors and approximate times
+// Cost 4: ~10ms
+// Cost 8: ~50ms
+// Cost 12: ~300ms (recommended)
+// Cost 14: ~1.2s (high security)
+// Cost 16: ~4.8s (very high security)
+
+// For production use
+int costFactor = 12; // Good balance of security and speed
+```
+
+### Async Operations
+
+```java
+// Async password hashing
+CompletableFuture<String> future = crypto.hashPasswordAsync(password);
+
+future.thenAccept(hashed -> {
+    // Use hashed password
+}).exceptionally(throwable -> {
+    // Handle error
+    return null;
+});
+```
+
+## Next Steps
+
+<Card title="Events API" icon="event" href="/nexauth/api/events">
+Event system for authentication events.
+</Card>

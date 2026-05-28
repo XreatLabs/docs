@@ -1,0 +1,170 @@
+---
+title: "Two-Factor Authentication Commands"
+description: "TOTP 2FA commands for enhanced account security"
+icon: 'smartphone'
+---
+
+# Two-Factor Authentication Commands
+
+Commands for managing TOTP (Time-based One-Time Password) two-factor authentication.
+
+## Setup Commands
+
+### `/2fa`
+
+Enable 2FA for your account.
+
+```bash
+/2fa
+```
+
+**Aliases:** `/2fauth`, `/2fauthcode`
+
+**Process:**
+1. Enter `/2fa` to start setup
+2. Generates TOTP secret
+3. Displays QR code
+4. Scan with authenticator app
+5. Enter verification code with `/2faconfirm <code>`
+6. 2FA enabled
+
+**Supported Apps:**
+- Google Authenticator
+- Authy
+- Microsoft Authenticator
+- LastPass Authenticator
+- Any TOTP-compatible app
+
+### `/2faconfirm`
+
+Confirm 2FA setup by entering the verification code from your authenticator app.
+
+```bash
+/2faconfirm <code>
+```
+
+**Requirements:**
+- Must be logged in
+- Account password required
+- 2FA code required
+
+## Verification Commands
+
+### `/2fa disable`
+
+Disable 2FA for your account.
+
+```bash
+/2fa disable <password>
+```
+
+**Use cases:**
+- Initial setup verification
+- Testing authenticator app
+- Troubleshooting 2FA issues
+
+## Recovery Commands
+
+### `/2fa backup-codes`
+
+Generate or view backup codes.
+
+```bash
+/2fa backup-codes
+```
+
+**Features:**
+- Generate 10 recovery codes
+- View unused codes
+- Regenerate codes
+
+**Usage:**
+- Use when authenticator app is unavailable
+- Each code can be used once
+- Store codes securely
+
+### `/2fa regenerate-codes`
+
+Regenerate backup codes.
+
+```bash
+/2fa regenerate-codes <password>
+```
+
+**Warning:** Invalidates all existing backup codes.
+
+## Configuration
+
+```hocon
+totp {
+    # Should we enable TOTP-Based Two-Factor Authentication?
+    enabled=true
+    # The label to be displayed in the 2FA app. Change this to your network name.
+    label="NexAuth Network"
+    # The delay in milliseconds until player is given a map to scan the QR code.
+    delay=1000
+}
+
+security {
+    totp {
+        # Whether to limit TOTP setup confirmation attempts.
+        attempt-limit-enabled=false
+        # Maximum invalid TOTP setup attempts allowed in a window.
+        max-attempts=5
+        # Window for TOTP setup attempt counting in milliseconds.
+        attempt-window-ms=300000
+    }
+}
+```
+
+## Security Best Practices
+
+<Checklist>
+- ✅ Store backup codes securely
+- ✅ Enable 2FA on admin accounts
+- ✅ Test authenticator app setup
+- ✅ Keep backup codes accessible
+- ✅ Regenerate codes if compromised
+</Checklist>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Can't scan QR code?">
+
+**Manual setup alternative:**
+1. Copy the text secret provided
+2. Enter it manually in your authenticator app
+3. Verify with `/2faconfirm <code>`
+
+</Accordion>
+
+<Accordion title="Lost authenticator app?">
+
+**Use backup codes:**
+1. Use one of your backup codes to login
+2. Run `/2fa backup-codes` to view remaining
+3. Disable and re-enable 2FA if needed
+
+</Accordion>
+
+<Accordion title="Invalid code errors?">
+
+**Common causes:**
+- Clock synchronization issues
+- Wrong code (codes expire every 30 seconds)
+- Time zone mismatch
+
+**Solutions:**
+- Check device time is accurate
+- Use fresh code from authenticator
+- Try again with new code
+
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<Card title="Premium Commands" icon="crown" href="/nexauth/commands/premium">
+Premium account management commands.
+</Card>

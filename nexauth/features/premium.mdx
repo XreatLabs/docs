@@ -1,0 +1,98 @@
+---
+title: "Premium Authentication"
+description: "Automatic premium account authentication with Minecraft's official authentication system"
+icon: 'crown'
+---
+
+# Premium Authentication
+
+NexAuth provides seamless integration with Minecraft's premium authentication system, allowing legitimate Minecraft account holders to authenticate automatically without passwords.
+
+## Overview
+
+Premium authentication leverages Mojang's official authentication servers to verify player identities automatically, providing a secure and convenient login experience for players who own Minecraft.
+
+<Features>
+  <Feature 
+    icon="zap"
+    title="Automatic Login"
+    description="Premium players join without entering passwords - verification happens automatically."
+  />
+  <Feature 
+    icon="shield"
+    title="Secure Verification"
+    description="Uses Mojang's official authentication system for account verification."
+  />
+  <Feature 
+    icon="users"
+    title="Mixed Mode"
+    description="Support both premium and cracked players on the same server."
+  />
+</Features>
+
+## Configuration
+
+### Basic Setup
+
+```hocon
+# Should we automatically register all players with a premium nickname?
+# !!CRACKED PLAYERS WILL NOT BE ABLE TO REGISTER PREMIUM USERNAMES!!
+auto-register=false
+
+# Sets the strategy for resolving profile conflicts. Available strategies:
+# BLOCK - Kick both players with the message key "kick-name-mismatch"
+# USE_OFFLINE - Use the offline profile
+# OVERWRITE - Overwrite the offline profile's data
+profile-conflict-resolution-strategy=BLOCK
+
+# The default crypto provider. This is used for hashing passwords. Available Providers:
+# BCrypt-2A - Newer, more safe, recommended
+# Argon-2ID - Newest, should be safer than BCrypt-2A, however, it can slow down the server
+# SHA-256 - Older, not recommended. Kept for compatibility reasons
+# SHA-512 - More safer than SHA-256, but still not recommended
+default-crypto-provider=BCrypt-2A
+```
+
+## Commands
+
+- `/premium <password>` - Enable premium auto-login
+- `/premiumconfirm` - Confirm premium linking
+- `/cracked` - Disable premium auto-login
+- `/premium status` - Check premium status
+- `/premium link <username>` - Link accounts (admin)
+- `/premium skin refresh` - Update player skin
+
+## Configuration Options
+
+### `auto-register: true/false`
+
+Automatically register all players with premium Minecraft usernames.
+
+- **true**: Premium players are auto-registered and can join without passwords
+- **false**: Premium players must use `/premium <password>` to enable auto-login
+
+**Note:** When enabled, cracked players cannot register premium usernames.
+
+### `profile-conflict-resolution-strategy: BLOCK|USE_OFFLINE|OVERWRITE`
+
+Defines how to handle conflicts when a premium player joins with a username that already exists as an offline account.
+
+- **BLOCK** (default): Kick both players with an error message. Admin must resolve manually.
+- **USE_OFFLINE**: Use the offline profile. Both players must login with the offline password.
+- **OVERWRITE**: Delete offline data and use premium profile. ⚠️ Use with caution - can be abused!
+
+### `default-crypto-provider: BCrypt-2A`
+
+The default encryption method for password hashing.
+
+Available providers:
+- **BCrypt-2A** (recommended): Modern, secure hashing
+- **Argon-2ID**: Newest, most secure but slower
+- **SHA-256**: Legacy, not recommended
+- **SHA-512**: Legacy, not recommended
+
+## Next Steps
+
+<Card title="Offline Mode" icon="user" href="/nexauth/features/offline">
+Configure offline player authentication.
+</Card>

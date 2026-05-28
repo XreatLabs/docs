@@ -1,0 +1,397 @@
+---
+title: "Plugin Integrations"
+description: "Integration guides for common plugins and services"
+icon: 'puzzle'
+---
+
+# Plugin Integrations
+
+NexAuth provides integration support for many popular Minecraft plugins and services.
+
+## Supported Integrations
+
+<Columns cols={3}>
+<Card title="Vault" icon="diamond">
+Economy and permissions integration.
+</Card>
+<Card title="PlaceholderAPI" icon="text">
+Dynamic placeholders for authentication status.
+</Card>
+<Card title="ProtocolLib" icon="network">
+Advanced packet handling.
+</Card>
+</Columns>
+
+## Vault Integration
+
+### Economy Integration
+
+```java
+// Grant starting balance after registration
+@EventHandler
+public void onPlayerRegister(PlayerRegisterEvent event) {
+    Player player = event.getPlayer();
+    
+    // Check if Vault is available
+    if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+        RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager()
+            .getRegistration(Economy.class);
+        
+        if (rsp != null) {
+            Economy economy = rsp.getProvider();
+            
+            // Grant starting balance
+            economy.depositPlayer(player, 1000.0);
+            
+            player.sendMessage("You received 1000 coins!");
+        }
+    }
+}
+```
+
+### Permission Integration
+
+```java
+// Grant permissions after authentication
+@EventHandler(priority = EventPriority.MONITOR)
+public void onPlayerLogin(PlayerLoginEvent event) {
+    if (event.isSuccess()) {
+        Player player = event.getPlayer();
+        
+        // Check if Vault permissions is available
+        RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager()
+            .getRegistration(Permission.class);
+        
+        if (rsp != null) {
+            Permission perms = rsp.getProvider();
+            
+            // Add authenticated group
+            String group = "authenticated";
+            perms.playerAddGroup(player, group);
+            
+            // Add premium group if applicable
+            if (NexAuthAPI.getInstance().getPremiumManager().isPremium(player)) {
+                perms.playerAddGroup(player, "premium");
+            }
+        }
+    }
+}
+```
+
+## PlaceholderAPI Integration
+
+### Built-in Placeholders
+
+NexAuth provides these PlaceholderAPI placeholders:
+
+| Placeholder | Description | Example |
+|-------------|-------------|---------|
+| `%nexauth_authenticated%` | Authentication status | true/false |
+| `%nexauth_premium%` | Premium status | true/false |
+| `%nexauth_2fa_enabled%` | 2FA status | true/false |
+| `%nexauth_registered_date%` | Registration date | 2024-01-15 |
+| `%nexauth_last_login%` | Last login time | 2024-01-20 14:30 |
+| `%nexauth_play_time%` | Total play time | 125h 30m |
+
+### Custom Placeholders
+
+```java
+// Register custom placeholder
+public class NexAuthPlaceholders extends PlaceholderExpansion {
+    
+    @Override
+    public String getIdentifier() {
+        return "nexauth";
+    }
+    
+    @Override
+    public String getAuthor() {
+        return "XreatLabs";
+    }
+    
+    @Override
+    public String getVersion() {
+        return "1.0.0";
+    }
+    
+    @Override
+    public String onPlaceholderRequest(Player player, String params) {
+        if (player == null) {
+            return "";
+        }
+        
+        NexAuthAPI api = NexAuthAPI.getInstance();
+        
+        switch (params) {
+            case "authenticated":
+                return String.valueOf(api.getAuthManager().isAuthenticated(player));
+                
+            case "premium":
+                return String.valueOf(api.getPremiumManager().isPremium(player));
+                
+            case "2fa_enabled":
+                return String.valueOf(api.getTOTPManager().hasTOTP(player));
+                
+            default:
+                return null;
+        }
+    }
+}
+```
+
+## ProtocolLib Integration
+
+### Packet Handling
+
+```java
+// Intercept authentication packets
+public class AuthPacketAdapter extends PacketAdapter {
+    
+    public AuthPacketAdapter() {
+        super(NexAuthPlugin.getInstance(), 
+              PacketType.Play.Client.CHAT);
+    }
+    
+    @Override
+    public void onPacketReceiving(PacketEvent event) {
+        Player player = event.getPlayer();
+        
+        // Check if player is authenticated
+        if (!NexAuthAPI.getInstance().getAuthManager().isAuthenticated(player)) {
+            // Block chat messages
+            event.setCancelled(true);
+            
+            player.sendMessage("You must authenticate first!");
+        }
+    }
+}
+
+// Register packet adapter
+ProtocolLibrary.getProtocolManager()
+    .addPacketListener(new AuthPacketAdapter());
+```
+
+## Discord Integration
+
+### Webhook Notifications
+
+```java
+// Send login notification to Discord
+@EventHandler(priority = EventPriority.MONITOR)
+public void onPlayerLogin(PlayerLoginEvent event) {
+    if (event.isSuccess()) {
+        Player player = event.getPlayer();
+        
+        // Send Discord webhook
+        DiscordWebhook webhook = new DiscordWebhook("your_webhook_url");
+        
+        webhook.addEmbed(new DiscordWebhook.EmbedObject()
+            .setTitle("Player Login")
+            .setDescription(player.getName() + " logged in successfully")
+            .addField("UUID", player.getUniqueId().toString(), false)
+            .addField("IP", event.getIpAddress(), false)
+            .addField("Time", new Date().toString(), false)
+            .setColor(Color.GREEN)
+        );
+        
+        webhook.execute();
+    }
+}
+```
+
+### DiscordSRV Integration
+
+```java
+// Sync authentication status with Discord
+@EventHandler(priority = EventPriority.MONITOR)
+public void onPlayerLogin(PlayerLoginEvent event) {
+    if (event.isSuccess()) {
+        Player player = event.getPlayer();
+        
+        // Check if DiscordSRV is available
+        if (Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
+            // Get linked Discord account
+            String discordId = DiscordSRV.getPlugin()
+                .getAccountLinkManager()
+                .getDiscordId(player.getUniqueId());
+            
+            if (discordId != null) {
+                // Update Discord role
+                DiscordSRV.getPlugin().getMainGuild()
+                    .addRoleToMember(discordId, "authenticated");
+            }
+        }
+    }
+}
+```
+
+## EssentialsX Integration
+
+### GeoIP Tracking
+
+```java
+// Log player location on authentication
+@EventHandler
+public void onPlayerLogin(PlayerLoginEvent event) {
+    Player player = event.getPlayer();
+    String ipAddress = event.getIpAddress();
+    
+    // Use EssentialsX GeoIP if available
+    if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
+        Essentials essentials = (Essentials) Bukkit.getPluginManager()
+            .getPlugin("Essentials");
+        
+        if (essentials != null) {
+            // Get location from IP
+            String country = essentials.getGeoAPI()
+                .getCountryName(ipAddress);
+            
+            getLogger().info(player.getName() + " logged in from " + country);
+        }
+    }
+}
+```
+
+### Balance Management
+
+```java
+// Protect economy during authentication
+@EventHandler(priority = EventPriority.LOWEST)
+public void onPlayerCommandPreProcess(PlayerCommandPreprocessEvent event) {
+    Player player = event.getPlayer();
+    String command = event.getMessage();
+    
+    // Check if command requires authentication
+    if (command.startsWith("/pay") || command.startsWith("/bal")) {
+        if (!NexAuthAPI.getInstance().getAuthManager().isAuthenticated(player)) {
+            event.setCancelled(true);
+            player.sendMessage("You must authenticate first!");
+        }
+    }
+}
+```
+
+## WorldGuard Integration
+
+### Region Protection
+
+```java
+// Protect regions until authenticated
+@EventHandler
+public void onPlayerMove(PlayerMoveEvent event) {
+    Player player = event.getPlayer();
+    
+    // Check if player is authenticated
+    if (!NexAuthAPI.getInstance().getAuthManager().isAuthenticated(player)) {
+        // Get WorldGuard
+        WorldGuard wg = WorldGuard.getInstance();
+        RegionManager rm = wg.getPlatform()
+            .getRegionContainer()
+            .get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        
+        // Check if player is entering protected region
+        Location to = event.getTo();
+        ApplicableRegionSet set = rm.getApplicableRegions(
+            BukkitAdapter.asBlockVector(to)
+        );
+        
+        if (set.size() > 0) {
+            // Cancel movement
+            event.setCancelled(true);
+            player.sendMessage("You must authenticate first!");
+        }
+    }
+}
+```
+
+## LuckPerms Integration
+
+### Permission Sync
+
+```java
+// Sync authentication status with permissions
+@EventHandler(priority = EventPriority.MONITOR)
+public void onPlayerLogin(PlayerLoginEvent event) {
+    if (event.isSuccess()) {
+        Player player = event.getPlayer();
+        
+        // Get LuckPerms
+        LuckPerms lp = LuckPermsProvider.get();
+        User user = lp.getPlayerAdapter(Player.class).getUser(player);
+        
+        // Add authenticated group
+        user.setPermission(InheritanceNode.builder("authenticated").build());
+        lp.getUserManager().saveUser(user);
+        
+        // Check premium status
+        if (NexAuthAPI.getInstance().getPremiumManager().isPremium(player)) {
+            user.setPermission(InheritanceNode.builder("premium").build());
+            lp.getUserManager().saveUser(user);
+        }
+    }
+}
+```
+
+## Custom Integration Example
+
+### Creating Custom Integration
+
+```java
+public class CustomNexAuthIntegration implements Listener {
+    private final NexAuthAPI nexauth;
+    private final CustomAPI customApi;
+    
+    public CustomNexAuthIntegration() {
+        this.nexauth = NexAuthAPI.getInstance();
+        this.customApi = new CustomAPI();
+        
+        // Register events
+        Bukkit.getPluginManager().registerEvents(
+            this, 
+            NexAuthPlugin.getInstance()
+        );
+    }
+    
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        if (event.isSuccess()) {
+            Player player = event.getPlayer();
+            
+            // Sync with custom service
+            customApi.syncPlayer(player);
+            
+            // Update custom permissions
+            customApi.updatePermissions(player);
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerRegister(PlayerRegisterEvent event) {
+        Player player = event.getPlayer();
+        
+        // Create account in custom service
+        customApi.createAccount(player);
+        
+        // Grant starter items
+        customApi.giveStarterItems(player);
+    }
+}
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Check if integration plugin is loaded
+- ✅ Handle integration failures gracefully
+- ✅ Use async operations for external APIs
+- ✅ Validate data from external sources
+- ✅ Test integrations thoroughly
+- ✅ Keep integrations optional
+- ✅ Document integration features
+</Checklist>
+
+## Support
+
+<Card title="Integration Help" icon="users" href="https://github.com/XreatLabs/NexAuth/discussions">
+Get help with plugin integrations on GitHub Discussions.
+</Card>

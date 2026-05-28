@@ -1,0 +1,164 @@
+---
+title: "Getting Started"
+description: "Quick start guide to get NexAuth running on your Minecraft server"
+icon: 'rocket'
+---
+
+# Getting Started with NexAuth
+
+Get NexAuth up and running on your Minecraft server in minutes.
+
+<Steps>
+<Step title="Prerequisites">
+Before installing NexAuth, ensure you have:
+
+- A supported Minecraft server platform (Velocity, Paper)
+- Java 17 or higher
+- Server administrator access
+- A database (MySQL/MariaDB, PostgreSQL, or H2 for testing)
+
+</Step>
+
+<Step title="Download NexAuth">
+Download the latest NexAuth release from [GitHub Releases](https://github.com/XreatLabs/NexAuth/releases).
+
+<Callout type="info">
+  A single `NexAuth.jar` works on both Velocity proxies and Paper/Purpur servers - no separate files needed.
+</Callout>
+
+</Step>
+
+<Step title="Install Plugin">
+Place the downloaded JAR file in your server's `plugins` folder.
+
+```bash
+# For Velocity
+cp NexAuth.jar /path/to/velocity/plugins/
+
+# For Paper
+cp NexAuth.jar /path/to/paper/plugins/
+```
+
+</Step>
+
+<Step title="Configure Database">
+Edit the NexAuth configuration file to set up your database connection.
+
+<Accordion title="View default config">
+```hocon
+database {
+    type=nexauth-mysql
+    properties {
+        mysql {
+            host=localhost
+            database=nexauth
+            password="your_password"
+            port=3306
+            user=nexauth
+        }
+    }
+}
+```
+</Accordion>
+
+</Step>
+
+<Step title="Restart Server">
+Restart your Minecraft server to load NexAuth.
+
+```bash
+# Stop the server, then start it again
+```
+
+NexAuth will automatically create the necessary database tables on first startup.
+
+</Step>
+
+<Step title="First Run Setup">
+When you first join the server, you'll be prompted to set up your account.
+
+1. Set a secure password with `/register <password> <confirm_password>`
+2. Login on future joins with `/login <password>` or `/l <password>`
+3. Configure additional security features as needed
+
+</Step>
+</Steps>
+
+## Next Steps
+
+<Columns cols={2}>
+<Card
+  title="Installation Guides"
+  icon="download"
+  href="/nexauth/installation/velocity"
+>
+Platform-specific installation instructions for Velocity and Paper.
+</Card>
+
+<Card
+  title="Configuration"
+  icon="settings"
+  href="/nexauth/features/premium"
+>
+Configure premium accounts, offline mode, and security features.
+</Card>
+
+<Card
+  title="Commands Reference"
+  icon="terminal"
+  href="/nexauth/commands/auth"
+>
+Complete reference for all NexAuth commands.
+</Card>
+
+<Card
+  title="Developer Docs"
+  icon="code"
+  href="/nexauth/developers/architecture"
+>
+Build custom integrations and contribute to NexAuth.
+</Card>
+</Columns>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Plugin not loading?">
+
+**Check your server logs** for error messages. Common issues:
+- Ensure you're using Java 17+
+- Verify you downloaded the correct version for your platform
+- Check that the JAR file isn't corrupted
+
+</Accordion>
+
+<Accordion title="Database connection failed?">
+
+**Verify your database settings:**
+- Ensure the database server is running
+- Check the host, port, and credentials in config
+- Confirm the database user has proper permissions
+- Test connectivity with `mysql -h host -u user -p`
+
+</Accordion>
+
+<Accordion title="Players can't authenticate?">
+
+**Common authentication issues:**
+- Verify the plugin is loaded and enabled
+- Check that database tables were created successfully
+- Ensure players are using the correct command syntax
+- Review server logs for authentication errors
+
+</Accordion>
+</AccordionGroup>
+
+## Need Help?
+
+<Card
+  title="Community Support"
+  icon="users"
+  href="https://github.com/XreatLabs/NexAuth/discussions"
+>
+Join our GitHub Discussions for community support and troubleshooting help.
+</Card>

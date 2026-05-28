@@ -1,0 +1,146 @@
+---
+title: "Authentication Commands"
+description: "Player commands for registration, login, and account management"
+icon: 'terminal'
+---
+
+# Authentication Commands
+
+Player commands for account registration, login, and basic account management.
+
+## Registration Commands
+
+### `/register`
+
+Register a new account.
+
+```bash
+/register <password> <confirm_password>
+```
+
+**Aliases:** `/reg`
+
+**Requirements:**
+- Password must meet minimum length requirements
+- Both passwords must match
+- Username must not be already registered
+- Player must not be IP-limited
+
+**Example:**
+```bash
+/register SecurePass123 SecurePass123
+```
+
+### `/login`
+
+Login to an existing account.
+
+```bash
+/login <password>
+```
+
+**Aliases:** `/l`, `/log`
+
+**Features:**
+- Auto-login if session is active
+- Brute force protection
+- Session creation on success
+
+**Example:**
+```bash
+/login SecurePass123
+```
+
+## Session Management
+
+### `/logout`
+
+Logout from current session.
+
+```bash
+/logout
+```
+
+**Effects:**
+- Invalidates current session
+- Requires login on next join
+- Clears temporary data
+
+## Password Management
+
+### `/changepassword`
+
+Change account password.
+
+```bash
+/changepassword <old_password> <new_password>
+```
+
+**Aliases:** `/changepass`
+
+**Requirements:**
+- Must be logged in
+- Old password must be correct
+- New password must meet requirements
+
+**Example:**
+```bash
+/changepassword OldPass NewSecurePass123
+```
+
+## Account Information
+
+### `/account`
+
+Display account information.
+
+```bash
+/account
+```
+
+**Shows:**
+- Account creation date
+- Last login time
+- Premium status
+- 2FA enabled status
+- Registered email (if set)
+
+## Account Deletion
+
+### `/unregister`
+
+Delete your account.
+
+```bash
+/unregister <password>
+```
+
+**Warning:** This action is irreversible and will delete all account data.
+
+**Requirements:**
+- Must be logged in
+- Correct password required
+- Confirmation may be required
+
+## Configuration Options
+
+```hocon
+# Commands that are allowed while the user is not authorized
+allowed-commands-while-unauthorized=[
+    login,
+    register,
+    "2fa",
+    "2faconfirm",
+    l,
+    log,
+    reg,
+    resetpassword,
+    confirmpasswordreset
+]
+```
+
+## Next Steps
+
+<Card title="Account Commands" icon="user" href="/nexauth/commands/account">
+Additional account management commands.
+</Card>

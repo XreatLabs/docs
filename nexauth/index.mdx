@@ -1,28 +1,239 @@
 ---
-title: NexAuth
-description: Advanced multiplatform authentication plugin for Minecraft servers
+title: "NexAuth"
+description: "Advanced multiplatform authentication plugin for Minecraft servers"
+icon: 'shield'
 ---
 
 # NexAuth
 
-NexAuth is a powerful multiplatform authentication plugin designed for Minecraft servers. It provides secure, flexible authentication across different platforms.
+<FeatureHero 
+  title="Enterprise-Grade Authentication for Minecraft Servers"
+  description="Advanced multiplatform authentication plugin with premium support, 2FA, and modern security features. Built for Velocity and Paper servers."
+/>
 
-## Features
+NexAuth is a powerful multiplatform authentication plugin designed for Minecraft servers. It provides secure, flexible authentication across different platforms with enterprise-grade security features.
 
-- **Multiplatform Support**: Works across different Minecraft server platforms
-- **Secure Authentication**: Advanced security features to protect player accounts
-- **Easy Integration**: Simple setup and configuration process
-- **Customizable**: Flexible settings to match your server's needs
+## Quick Start
 
-## Installation
+<Columns cols={3}>
+<Card
+  title="Install"
+  icon="download"
+  href="/nexauth/getting-started"
+>
+Get NexAuth running in minutes with our quick start guide.
+</Card>
 
-Coming soon to [XreatLabs GitHub](https://github.com/XreatLabs/NexAuth).
+<Card
+  title="Configure"
+  icon="settings"
+  href="/nexauth/features/premium"
+>
+Set up premium accounts, offline mode, and security features.
+</Card>
+
+<Card
+  title="Integrate"
+  icon="code"
+  href="/nexauth/api/overview"
+>
+Build custom integrations with our comprehensive API.
+</Card>
+</Columns>
+
+## Key Features
+
+<Features>
+  <Feature 
+    icon="layers"
+    title="Multiplatform Support"
+    description="Works seamlessly across Velocity proxies and Paper servers with unified authentication."
+  />
+  <Feature 
+    icon="crown"
+    title="Premium Account Integration"
+    description="Automatic premium authentication with optional offline mode support for cracked players."
+  />
+  <Feature 
+    icon="smartphone"
+    title="Two-Factor Authentication"
+    description="TOTP-based 2FA support with QR code setup and backup codes."
+  />
+  <Feature 
+    icon="mobile"
+    title="Bedrock Edition Support"
+    description="Native Floodgate integration for Bedrock player authentication."
+  />
+  <Feature 
+    icon="shield"
+    title="Advanced Security"
+    description="Brute force protection, secure password hashing, and session management."
+  />
+  <Feature 
+    icon="code"
+    title="Developer API"
+    description="Comprehensive API for custom integrations and plugin development."
+  />
+</Features>
+
+## Platform Support
+
+<Columns cols={2}>
+<Card
+  title="Velocity"
+  icon="zap"
+  href="/nexauth/installation/velocity"
+>
+High-performance proxy support with cross-server authentication and unified player sessions.
+</Card>
+
+<Card
+  title="Paper"
+  icon="server"
+  href="/nexauth/installation/paper"
+>
+Native Paper server integration with full feature support and optimized performance.
+</Card>
+</Columns>
+
+## Security First
+
+<Card
+  title="Enterprise Security Features"
+  icon="lock"
+  href="/nexauth/features/security"
+>
+
+NexAuth implements industry-standard security practices to protect player accounts:
+
+- **Secure Password Hashing** - bcrypt with adaptive work factor
+- **Brute Force Protection** - Rate limiting and account lockouts
+- **Session Management** - Configurable sessions with IP validation
+- **Encryption at Rest** - Sensitive data encrypted in database
+- **SQL Injection Prevention** - Parameterized database queries
+- **Comprehensive Logging** - Authentication event audit trail
+
+</Card>
+
+## For Developers
+
+<Columns cols={2}>
+<Card
+  title="API Documentation"
+  icon="book"
+  href="/nexauth/api/overview"
+>
+Complete API reference for integrating NexAuth with your plugins and applications.
+</Card>
+
+<Card
+  title="Developer Guide"
+  icon="code"
+  href="/nexauth/developers/architecture"
+>
+Build custom integrations, contribute to the project, and extend functionality.
+</Card>
+</Columns>
 
 ## Documentation
 
-Full documentation will be available soon.
+<AccordionGroup>
+<Accordion title="Installation & Setup">
 
-## Links
+Get started with NexAuth installation and configuration:
 
-- **GitHub**: [github.com/XreatLabs/NexAuth](https://github.com/XreatLabs/NexAuth)
-- **Website**: [xreatlabs.space](https://xreatlabs.space)
+- [Getting Started Guide](/nexauth/getting-started) - Quick start walkthrough
+- [Velocity Installation](/nexauth/installation/velocity) - Proxy setup instructions
+- [Paper Installation](/nexauth/installation/paper) - Server setup instructions  
+- [Database Setup](/nexauth/installation/database) - Database configuration guide
+- [First Run](/nexauth/installation/first-run) - Initial configuration steps
+
+</Accordion>
+
+<Accordion title="Features & Configuration">
+
+Learn about NexAuth features and configuration:
+
+- [Premium Auth](/nexauth/features/premium) - Premium account integration
+- [Offline Mode](/nexauth/features/offline) - Cracked player support
+- [TOTP 2FA](/nexauth/features/totp) - Two-factor authentication
+- [Sessions](/nexauth/features/sessions) - Session management
+- [Bedrock Support](/nexauth/features/bedrock) - Floodgate integration
+- [Security](/nexauth/features/security) - Security features overview
+
+</Accordion>
+
+<Accordion title="Commands Reference">
+
+Complete command documentation for players and administrators:
+
+- [Auth Commands](/nexauth/commands/auth) - `/register`, `/login`, etc.
+- [Account Commands](/nexauth/commands/account) - Account management commands
+- [2FA Commands](/nexauth/commands/2fa) - Two-factor authentication commands
+- [Premium Commands](/nexauth/commands/premium) - Premium account commands
+- [Admin Commands](/nexauth/commands/admin) - Administration commands
+- [Permissions](/nexauth/commands/permissions) - Permission nodes reference
+
+</Accordion>
+
+<Accordion title="Developer Resources">
+
+Technical documentation for developers:
+
+- [Architecture](/nexauth/developers/architecture) - Internal architecture overview
+- [Building](/nexauth/developers/building) - Build and development setup
+- [Contributing](/nexauth/developers/contributing) - Contribution guidelines
+- [Platforms](/nexauth/developers/platforms) - Multiplatform implementation details
+- [Limbo Integration](/nexauth/developers/limbo) - Limbo server integration
+
+</Accordion>
+
+<Accordion title="API Reference">
+
+Comprehensive API documentation:
+
+- [API Overview](/nexauth/api/overview) - API introduction and getting started
+- [Providers](/nexauth/api/providers) - Authentication provider API
+- [Database](/nexauth/api/database) - Database abstraction layer
+- [Crypto](/nexauth/api/crypto) - Cryptography utilities
+- [Events](/nexauth/api/events) - Event system reference
+- [Integrations](/nexauth/api/integrations) - Plugin integration guides
+
+</Accordion>
+</AccordionGroup>
+
+## Community & Support
+
+<Columns cols={3}>
+<Card
+  title="GitHub"
+  icon="github"
+  href="https://github.com/XreatLabs/NexAuth"
+>
+Source code, issues, and contributions.
+</Card>
+
+<Card
+  title="Discussions"
+  icon="message-square"
+  href="https://github.com/XreatLabs/NexAuth/discussions"
+>
+Community discussions and support.
+</Card>
+
+<Card
+  title="Website"
+  icon="globe"
+  href="https://xreatlabs.space"
+>
+XreatLabs official website.
+</Card>
+</Columns>
+
+<Card
+  title="Get Started with NexAuth"
+  icon="rocket"
+  href="/nexauth/getting-started"
+>
+Ready to secure your Minecraft server? Follow our quick start guide to get NexAuth up and running in minutes.
+</Card>

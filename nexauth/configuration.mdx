@@ -1,0 +1,665 @@
+---
+title: "Configuration Reference"
+description: "Complete reference for all NexAuth configuration options with explanations and best practices"
+icon: 'settings'
+---
+
+# Configuration Reference
+
+Complete guide to every NexAuth configuration setting in `config.conf`. NexAuth uses **HOCON format** (Human-Optimized Config Object Notation) for configuration.
+
+<Callout type="info">
+  **Configuration Location:**
+  - **Velocity**: `plugins/nexauth/config.conf`
+  - **Paper/Purpur**: `plugins/NexAuth/config.conf`
+  
+  The file is automatically generated on first startup with default values.
+</Callout>
+
+## Quick Start
+
+<Steps>
+<Step title="Generate Config">
+Start your server once to generate the default `config.conf` file.
+</Step>
+<Step title="Edit Configuration">
+Edit `config.conf` with your preferred settings.
+</Step>
+<Step title="Restart">
+Restart the server to apply your changes.
+</Step>
+</Steps>
+
+---
+
+## Configuration Categories
+
+<AccordionGroup>
+<Accordion title="Database Configuration">
+
+### Database Type
+
+```hocon
+database {
+    # Database type: nexauth-sqlite, nexauth-mysql, or nexauth-postgresql
+    type=nexauth-sqlite
+    
+    # Retry transient failures (0 = disabled)
+    transient-retries=0
+    
+    # Delay between retries in milliseconds
+    transient-retry-delay-ms=250
+    
+    properties {
+        mysql {
+            host=localhost
+            port=3306
+            database=nexauth
+            user=root
+            password=""
+            max-life-time=600000
+        }
+        postgresql {
+            host=localhost
+            port=5432
+            database=nexauth
+            user=root
+            password=""
+            max-life-time=600000
+        }
+        sqlite {
+            path="user-data.db"
+        }
+    }
+}
+```
+
+**Settings Explained:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `type` | String | `nexauth-sqlite` | Database backend type |
+| `transient-retries` | Integer | `0` | Retry count for transient failures |
+| `transient-retry-delay-ms` | Integer | `250` | Delay between retries (ms) |
+| `max-life-time` | Integer | `600000` | Connection lifetime (10 minutes) |
+
+<Callout type="tip">
+  **Database Recommendations:**
+  - **Small servers (< 100 players)**: SQLite (default)
+  - **Medium servers (100-500 players)**: MySQL/MariaDB
+  - **Large networks (500+ players)**: PostgreSQL
+</Callout>
+
+</Accordion>
+
+<Accordion title="Authentication Settings">
+
+### Login & Registration
+
+```hocon
+# Commands allowed while unauthorized
+allowed-commands-while-unauthorized=[
+    login, register, "2fa", "2faconfirm",
+    l, log, reg, resetpassword, confirmpasswordreset
+]
+
+# Maximum login attempts (-1 = disabled)
+max-login-attempts=-1
+
+# Time to reset login attempts (ms)
+milliseconds-to-refresh-login-attempts=10000
+
+# Login/register time limit (seconds, -1 = disabled)
+seconds-to-authorize=-1
+```
+
+**Settings Explained:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `allowed-commands-while-unauthorized` | List<String> | See config | Commands usable before login |
+| `max-login-attempts` | Integer | `-1` | Kick after N wrong passwords |
+| `milliseconds-to-refresh-login-attempts` | Integer | `10000` | Reset attempt counter after this time |
+| `seconds-to-authorize` | Integer | `-1` | Time limit to complete login |
+
+<Callout type="warning">
+  **Security Note:** Setting `max-login-attempts` too low may frustrate users with typos. Recommended: 3-5 attempts.
+</Callout>
+
+### Password Requirements
+
+```hocon
+# Minimum password length (-1 = disabled)
+minimum-password-length=-1
+
+# Minimum username length for new players (0 = disabled)
+minimum-username-length=-1
+```
+
+**Recommendations:**
+- `minimum-password-length`: Set to `8` for better security
+- `minimum-username-length`: Set to `3` to prevent very short names
+
+</Accordion>
+
+<Accordion title="Security & Cryptography">
+
+### Crypto Providers
+
+```hocon
+# Password hashing algorithm
+default-crypto-provider=BCrypt-2A
+
+# Profile conflict resolution
+profile-conflict-resolution-strategy=BLOCK
+
+# UUID generation method
+new-uuid-creator=CRACKED
+
+# Max accounts per IP (-1 = disabled)
+ip-limit=-1
+```
+
+**Crypto Provider Options:**
+
+| Provider | Security | Performance | Recommended |
+|----------|----------|-------------|-------------|
+| **Argon-2ID** | Highest | Slowest (2-5s) | High-security servers |
+| **BCrypt-2A** | High | Medium (~100ms) | ✅ Recommended |
+| **SHA-512** | Medium | Fast | Migration only |
+| **SHA-256** | Low | Fast | Migration only |
+
+**Profile Conflict Strategies:**
+
+| Strategy | Behavior | Use Case |
+|----------|----------|----------|
+| **BLOCK** | Kicks both players, admin resolves | Safest option |
+| **USE_OFFLINE** | Prioritizes cracked account | Protects existing users |
+| **OVERWRITE** | Deletes offline data | ⚠️ Dangerous - can be abused |
+
+**UUID Creator Options:**
+
+| Creator | Behavior |
+|---------|----------|
+| **RANDOM** | Generates random UUID |
+| **CRACKED** | UUID based on username (offline mode) |
+| **MOJANG** | Uses Mojang UUID if available |
+
+<Callout type="warning">
+  **Important:** `ip-limit` is **NOT RECOMMENDED** due to IPv4 address sharing (NAT, schools, public Wi-Fi). Entire villages may share one IP.
+</Callout>
+
+### Advanced Security Features
+
+```hocon
+security {
+    login {
+        backoff {
+            # Exponential delay after wrong passwords
+            enabled=false
+            initial-ms=1000
+            max-ms=30000
+            multiplier=2
+        }
+        lockout {
+            # Hard lockout after repeated failures
+            enabled=false
+            threshold=10
+            duration-ms=300000
+        }
+    }
+    totp {
+        # Limit TOTP setup attempts
+        attempt-limit-enabled=false
+        max-attempts=5
+        attempt-window-ms=300000
+    }
+}
+```
+
+**Login Backoff** (Exponential Delay):
+- Starts at `initial-ms` (1 second)
+- Multiplies by `multiplier` each failure: 1s → 2s → 4s → 8s → 16s → 30s (capped)
+- **Recommended:** Enable for production servers
+
+**Login Lockout** (Hard Ban):
+- After `threshold` failures, locks out for `duration-ms`
+- **Recommended:** `threshold: 5-10`, `duration-ms: 300000` (5 minutes)
+
+</Accordion>
+
+<Accordion title="Session Management">
+
+```hocon
+# Session timeout in seconds (0 = disabled)
+session-timeout=0
+
+# Remember last server/world
+remember-last-server=false
+```
+
+**How Sessions Work:**
+
+A player stays logged in if ALL conditions are met:
+1. `session-timeout` has not expired
+2. IP address matches previous login
+3. Player has authenticated before
+
+**Session Timeout Examples:**
+
+| Value | Duration | Use Case |
+|-------|----------|----------|
+| `0` or `-1` | Disabled | High security |
+| `1800` | 30 minutes | Balanced |
+| `86400` | 1 day | Convenience |
+| `604800` | 1 week | Maximum convenience |
+
+<Callout type="info">
+  **Platform Difference:**
+  - **Velocity**: Sessions shared across all backend servers
+  - **Paper**: Sessions validated per server
+</Callout>
+
+</Accordion>
+
+<Accordion title="Premium Authentication">
+
+```hocon
+# Auto-register premium players
+auto-register=false
+
+# Profile conflict handling
+profile-conflict-resolution-strategy=BLOCK
+```
+
+**Premium Auto-Login:**
+
+When a premium player joins:
+1. If `auto-register=true`: Automatically creates account
+2. If `auto-register=false`: Player must register first
+3. Once premium UUID is set: Auto-login on future joins
+
+**Conflict Resolution:**
+
+When both premium and cracked players have the same username:
+- **BLOCK**: Kicks both, requires admin intervention
+- **USE_OFFLINE**: Cracked player keeps account, premium must rename
+- **OVERWRITE**: Deletes cracked data (⚠️ dangerous)
+
+<Callout type="warning">
+  **Important:** When `auto-register=true`, cracked players **CANNOT** register premium usernames. This is by design to prevent account theft.
+</Callout>
+
+</Accordion>
+
+<Accordion title="TOTP Two-Factor Authentication">
+
+```hocon
+totp {
+    # Enable TOTP 2FA (Google Authenticator, etc.)
+    enabled=true
+    
+    # Label shown in authenticator app
+    label="NexAuth Network"
+    
+    # Delay before showing QR code map (ms)
+    delay=1000
+}
+
+security {
+    totp {
+        # Limit TOTP setup attempts
+        attempt-limit-enabled=false
+        max-attempts=5
+        attempt-window-ms=300000
+    }
+}
+```
+
+**Requirements:**
+- Protocolize plugin must be installed
+- Players need an authenticator app (Google Authenticator, Authy, etc.)
+
+**TOTP Attempt Limiting:**
+- Prevents brute force on TOTP codes during setup
+- `attempt-window-ms`: Time window for counting attempts (default: 5 minutes)
+- After `max-attempts`: Player must retry setup
+
+<Callout type="tip">
+  **Recommendation:** Enable TOTP for staff accounts and administrators. Set `totp.label` to your network name for easy identification.
+</Callout>
+
+</Accordion>
+
+<Accordion title="Platform-Specific Settings">
+
+<Tabs>
+<Tab label="Velocity">
+
+```hocon
+# Velocity-only settings
+
+# Port range for dynamic limbo servers
+limbo-port-range="30000-40000"
+
+# Check backend server status
+ping-servers=false
+
+# Fallback to lobby on server shutdown
+fallback=false
+```
+
+**Velocity Explained:**
+- `limbo-port-range`: Ports for automatic limbo server creation
+- `ping-servers`: Check if backend servers are online
+- `fallback`: Send players to lobby if their server crashes
+
+</Tab>
+
+<Tab label="Paper/Purpur">
+
+```hocon
+# Paper-only settings
+
+# Allow proxy connections
+allow-proxy-connections=true
+
+# Hide inventory during auth (PacketEvents)
+hide-player-inventory=true
+```
+
+**Paper Explained:**
+- `allow-proxy-connections`: Required for reverse proxy/VPN setups
+- `hide-player-inventory`: Packet-level inventory hiding
+
+<Callout type="warning">
+  **Important:** Disabling `allow-proxy-connections` may break NexAuth if your server is behind a reverse proxy or VPN.
+</Callout>
+
+</Tab>
+</Tabs>
+
+**Shared Settings (Platform-Dependent Behavior):**
+
+```hocon
+# Limbo servers/worlds
+limbo=[limbo0, limbo1]  # Velocity: server names | Paper: world names
+
+# Lobby servers/worlds
+lobby {
+    root=[lobby0, lobby1]  # Velocity: server names | Paper: world names
+}
+```
+
+<Callout type="info">
+  **Paper Configuration:** When using Paper, put ALL worlds under `lobby.root`. The worlds must exist on your server.
+</Callout>
+
+</Accordion>
+
+<Accordion title="User Interface">
+
+```hocon
+# Show title messages during auth
+use-titles=true
+
+# Show action bar during auth
+use-action-bar=false
+
+# Notification refresh interval (ms)
+milliseconds-to-refresh-notification=10000
+```
+
+**UI Options:**
+
+| Setting | Default | Effect |
+|---------|---------|--------|
+| `use-titles` | `true` | Large on-screen text |
+| `use-action-bar` | `false` | Text above hotbar |
+| `milliseconds-to-refresh-notification` | `10000` | How often to remind players |
+
+<Callout type="tip">
+  **Best Practice:** Use either titles OR action bar, not both. Action bar is less intrusive.
+</Callout>
+
+</Accordion>
+
+<Accordion title="Email Configuration">
+
+```hocon
+mail {
+    # Enable password recovery via email
+    enabled=false
+    
+    # SMTP server settings
+    host="smtp.gmail.com"
+    port=587
+    username="your-email@gmail.com"
+    password="your-app-password"
+    
+    # Email sender info
+    sender="NexAuth Network"
+    email="noreply@yournetwork.com"
+}
+```
+
+**Email Setup:**
+
+1. Enable SMTP access for your email service
+2. Use an **App Password** (not your main password)
+3. Configure SMTP host and port
+
+<Callout type="warning">
+  **Security:** Never use your main email password. Generate an app password through your email provider's security settings.
+</Callout>
+
+**SMTP Settings for Common Providers:**
+
+| Provider | Host | Port |
+|----------|------|------|
+| Gmail | `smtp.gmail.com` | `587` |
+| Outlook | `smtp.office365.com` | `587` |
+| Yahoo | `smtp.mail.yahoo.com` | `587` |
+
+</Accordion>
+
+<Accordion title="System & Debug">
+
+```hocon
+# Enable debug logging
+debug=false
+
+# Failure policy mode
+failure-policy {
+    mode=HARD_FAIL  # Options: HARD_FAIL, RETRY_THEN_DISABLE, DEGRADE
+}
+
+# Main thread IO checking
+strict-main-thread-io-check=false
+
+# Config revision (DO NOT MODIFY)
+revision=8
+```
+
+**Failure Policy Modes:**
+
+| Mode | Behavior |
+|------|----------|
+| **HARD_FAIL** | Shutdown on persistent failures |
+| **RETRY_THEN_DISABLE** | Retry then disable features |
+| **DEGRADE** | Continue with reduced functionality |
+
+**Debug Mode:**
+- Prints detailed logs to console
+- Useful for troubleshooting
+- **Do not enable in production** (performance impact)
+
+<Callout type="warning">
+  **Do Not Modify:** The `revision` field is used internally by NexAuth. Changing it can cause configuration errors.
+</Callout>
+
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Example Configurations
+
+### Small Server Setup (SQLite)
+
+```hocon
+database {
+    type=nexauth-sqlite
+}
+
+auto-register=false
+default-crypto-provider=BCrypt-2A
+max-login-attempts=5
+session-timeout=604800
+totp.enabled=true
+```
+
+### Production Network (MySQL)
+
+```hocon
+database {
+    type=nexauth-mysql
+    transient-retries=3
+    transient-retry-delay-ms=500
+    properties {
+        mysql {
+            host=localhost
+            port=3306
+            database=nexauth
+            user=nexauth_user
+            password="secure_password"
+        }
+    }
+}
+
+auto-register=false
+default-crypto-provider=Argon-2ID
+max-login-attempts=5
+session-timeout=86400
+security.login.backoff.enabled=true
+security.login.lockout.enabled=true
+totp.enabled=true
+mail.enabled=true
+```
+
+### High Security Setup
+
+```hocon
+default-crypto-provider=Argon-2ID
+max-login-attempts=3
+milliseconds-to-refresh-login-attempts=300000
+session-timeout=1800
+minimum-password-length=12
+profile-conflict-resolution-strategy=BLOCK
+
+security.login.backoff.enabled=true
+security.login.backoff.initial-ms=2000
+security.login.backoff.multiplier=2
+security.login.lockout.enabled=true
+security.login.lockout.threshold=5
+security.login.lockout.duration-ms=900000
+
+security.totp.attempt-limit-enabled=true
+totp.enabled=true
+```
+
+---
+
+## Best Practices
+
+<Checklist>
+- ✅ Use `BCrypt-2A` or `Argon-2ID` for password hashing
+- ✅ Set `max-login-attempts` to 3-5
+- ✅ Enable TOTP for staff accounts
+- ✅ Use `session-timeout` for convenience (1-7 days)
+- ✅ Set `profile-conflict-resolution-strategy` to `BLOCK`
+- ✅ Enable `security.login.backoff` for production
+- ❌ Don't use `ip-limit` (IPv4 sharing issues)
+- ❌ Don't use `OVERWRITE` conflict strategy
+- ❌ Don't enable `debug` in production
+- ❌ Don't modify the `revision` field
+</Checklist>
+
+---
+
+## Migration Configuration
+
+```hocon
+migration {
+    # Run migration on next startup
+    on-next-startup=false
+    
+    # Source plugin type
+    type=authme-sqlite
+    
+    # Old database connection
+    old-database {
+        mysql {
+            host=localhost
+            port=3306
+            database=authme
+            user=root
+            password=""
+            table=authme
+        }
+        postgresql {
+            host=localhost
+            port=5432
+            database=authme
+            user=root
+            password=""
+            table=authme
+        }
+        sqlite {
+            path="AuthMe/accounts.db"
+        }
+    }
+}
+```
+
+**Supported Migrations:**
+
+| Plugin | Type |
+|--------|------|
+| AuthMe | `authme-mysql`, `authme-sqlite`, `authme-postgresql` |
+| JPremium | `jpremium-mysql` |
+| NLogin | `nlogin-mysql`, `nlogin-sqlite` |
+| LoginSecurity | `loginsecurity-mysql`, `loginsecurity-sqlite` |
+| FastLogin | `fastlogin-mysql`, `fastlogin-sqlite` |
+| LimboAuth | `limboauth-mysql` |
+| And more... | See documentation |
+
+<Callout type="info">
+  **Migration Process:**
+  1. Set `on-next-startup=true`
+  2. Configure `old-database` connection
+  3. Set correct `type`
+  4. Restart server
+  5. Migration runs automatically
+  6. Set `on-next-startup=false` after completion
+</Callout>
+
+---
+
+## Next Steps
+
+<Card title="Premium Authentication" icon="crown" href="/nexauth/features/premium">
+Configure premium account auto-login and profile conflict resolution.
+</Card>
+
+<Card title="Security Features" icon="shield" href="/nexauth/features/security">
+Learn about brute force protection, password hashing, and security best practices.
+</Card>
+
+<Card title="TOTP 2FA" icon="smartphone" href="/nexauth/features/totp">
+Set up two-factor authentication for enhanced account security.
+</Card>
+
+<Card title="Database Setup" icon="database" href="/nexauth/installation/database">
+Configure MySQL, PostgreSQL, or SQLite for your server.
+</Card>

@@ -1,0 +1,231 @@
+---
+title: "Admin Commands"
+description: "Administrative commands for server management and player administration"
+icon: 'shield'
+---
+
+# Admin Commands
+
+Administrative commands for managing players, authentication, and server settings.
+
+## Player Management
+
+### `/nexauth account`
+
+View detailed player account information.
+
+```bash
+/nexauth account <player>
+```
+
+**Shows:**
+- Account UUID and username
+- Registration date
+- Last login details
+- Premium status
+- 2FA status
+- Session information
+- IP history
+
+### `/nexauth changepassword`
+
+Change a player's password.
+
+```bash
+/nexauth changepassword <player> <new_password>
+```
+
+**Use cases:**
+- Password recovery
+- Forced password changes
+- Compromised account reset
+
+### `/nexauth unregister`
+
+Delete a player's account.
+
+```bash
+/nexauth unregister <player>
+```
+
+**Effects:**
+- Removes account data
+- Invalidates sessions
+- Deletes 2FA data
+- Removes premium links
+
+## Session Management
+
+### `/nexauth sessions`
+
+View and manage active sessions.
+
+```bash
+/nexauth sessions list
+/nexauth sessions revoke <player>
+/nexauth sessions revoke-all
+```
+
+**Features:**
+- List all active sessions
+- Revoke specific player sessions
+- Revoke all server sessions
+- View session details
+
+## Premium Management
+
+### `/nexauth premium`
+
+Manage premium account status.
+
+```bash
+/nexauth premium set <player> true/false
+/nexauth premium check <player>
+/nexauth premium sync
+```
+
+**Operations:**
+- Set premium status manually
+- Check premium verification
+- Sync with Mojang servers
+- Bulk premium updates
+
+## Database Management
+
+### `/nexauth database`
+
+Database operations and maintenance.
+
+```bash
+/nexauth database backup
+/nexauth database restore <file>
+/nexauth database optimize
+/nexauth database cleanup
+```
+
+**Maintenance:**
+- Backup database
+- Restore from backup
+- Optimize tables
+- Clean old data
+
+## Export/Import
+
+### `/nexauth export`
+
+Export player data.
+
+```bash
+/nexauth export all
+/nexauth export players
+/nexauth export sessions
+```
+
+**Formats:** JSON, CSV, SQL
+
+### `/nexauth import`
+
+Import player data from other plugins.
+
+```bash
+/nexauth import authme <file>
+/nexauth import xauth <file>
+/nexauth import csv <file>
+```
+
+**Supported:**
+- AuthMe
+- xAuth
+- LoginSecurity
+- Generic CSV/SQL
+
+## Configuration Commands
+
+### `/nexauth reload`
+
+Reload plugin configuration.
+
+```bash
+/nexauth reload [config/database/messages]
+```
+
+**Options:**
+- `config` - Reload configuration files
+- `database` - Reconnect to database
+- `messages` - Reload language files
+
+### `/nexauth debug`
+
+Enable/disable debug mode.
+
+```bash
+/nexauth debug <level>
+```
+
+**Levels:**
+- `0` - Errors only
+- `1` - Errors and warnings
+- `2` - Add info messages
+- `3` - Full debug output
+
+## Statistics
+
+### `/nexauth stats`
+
+View authentication statistics.
+
+```bash
+/nexauth stats
+```
+
+**Shows:**
+- Total registered players
+- Active sessions
+- Premium player count
+- 2FA enabled accounts
+- Recent authentication attempts
+- Failed login attempts
+
+## Configuration
+
+```yaml
+commands:
+  admin:
+    # Require admin permission
+    permission: "nexauth.admin"
+    
+    # Console-only commands
+    console-only: false
+    
+    # Cooldowns
+    cooldowns:
+      changepassword: 0
+      unregister: 30
+```
+
+## Permissions
+
+```yaml
+nexauth.admin.*: true  # All admin commands
+nexauth.admin.account: true  # View accounts
+nexauth.admin.changepassword: true  # Change passwords
+nexauth.admin.unregister: true  # Delete accounts
+nexauth.admin.sessions: true  # Manage sessions
+nexauth.admin.premium: true  # Manage premium status
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Use `/nexauth database backup` before bulk operations
+- ✅ Verify player identity before password changes
+- ✅ Monitor `/nexauth stats` for suspicious activity
+- ✅ Keep regular backups of player data
+- ✅ Test import commands on test servers first
+</Checklist>
+
+## Next Steps
+
+<Card title="Permissions Reference" icon="key" href="/nexauth/commands/permissions">
+Complete permission nodes reference.
+</Card>

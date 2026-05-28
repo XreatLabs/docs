@@ -1,0 +1,66 @@
+---
+title: "Session Management"
+description: "Configure player sessions for persistent authentication across servers"
+icon: 'clock'
+---
+
+# Session Management
+
+NexAuth provides intelligent session management to balance security and user convenience across single servers and multi-server networks.
+
+## Overview
+
+Sessions allow authenticated players to remain logged in across server restarts, server changes, and extended play periods without repeatedly entering passwords.
+
+<Features>
+  <Feature 
+    icon="refresh"
+    title="Persistent Sessions"
+    description="Players stay logged in across server restarts and reconnections."
+  />
+  <Feature 
+    icon="network"
+    title="Cross-Server Sessions"
+    description="Unified authentication across Velocity backend servers."
+  />
+  <Feature 
+    icon="shield"
+    title="IP Validation"
+    description="Optional IP binding for enhanced session security."
+  />
+</Features>
+
+## Configuration
+
+```hocon
+# Defines a time in seconds after a player's session expires.
+# Default value is one week (604800 seconds). Set to zero or less to disable sessions.
+session-timeout=604800
+
+# Should we remember the last server/world a player was on?
+remember-last-server=false
+```
+
+## Session Types
+
+<Columns cols={2}>
+<Card title="Local Sessions" icon="server">
+Single-server session persistence with configurable duration.
+</Card>
+<Card title="Network Sessions" icon="network">
+Cross-server sessions for Velocity networks.
+</Card>
+</Columns>
+
+## Security Options
+
+- **IP Validation** - Bind sessions to IP addresses
+- **Device Fingerprinting** - Track player devices
+- **Concurrent Session Limits** - Control multiple logins
+- **Automatic Expiration** - Time-based session cleanup
+
+## Next Steps
+
+<Card title="Bedrock Support" icon="mobile" href="/nexauth/features/bedrock">
+Configure Floodgate integration for Bedrock players.
+</Card>

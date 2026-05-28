@@ -1,0 +1,427 @@
+---
+title: "Contributing Guidelines"
+description: "Guidelines for contributing to NexAuth development"
+icon: 'users'
+---
+
+# Contributing Guidelines
+
+Thank you for your interest in contributing to NexAuth! This document provides guidelines for contributing code, reporting issues, and participating in the project.
+
+## Getting Started
+
+<Steps>
+<Step title="Fork Repository">
+Fork the NexAuth repository on GitHub.
+
+```bash
+# Fork at https://github.com/XreatLabs/NexAuth
+```
+
+</Step>
+
+<Step title="Clone Your Fork">
+Clone your fork locally.
+
+```bash
+git clone https://github.com/YOUR_USERNAME/NexAuth.git
+cd NexAuth
+```
+
+</Step>
+
+<Step title="Set Up Remote">
+Add the original repository as upstream.
+
+```bash
+git remote add upstream https://github.com/XreatLabs/NexAuth.git
+```
+
+</Step>
+
+<Step title="Build Project">
+Follow the [Building Guide](/nexauth/developers/building) to set up your development environment.
+
+</Step>
+</Steps>
+
+## Contribution Types
+
+### Code Contributions
+
+#### Feature Development
+
+1. **Discuss First**
+   - Open an issue to discuss the feature
+   - Get feedback from maintainers
+   - Plan implementation approach
+
+2. **Implementation**
+   - Create feature branch: `git checkout -b feature/your-feature`
+   - Write clean, documented code
+   - Add tests for new functionality
+   - Update documentation
+
+3. **Testing**
+   - Ensure all tests pass
+   - Test on both Velocity and Paper
+   - Check for regressions
+
+4. **Pull Request**
+   - Create descriptive PR
+   - Reference related issue
+   - Respond to review feedback
+
+#### Bug Fixes
+
+1. **Report Bug**
+   - Create issue with detailed information
+   - Include reproduction steps
+   - Provide error logs
+
+2. **Fix Implementation**
+   - Create bugfix branch: `git checkout -b fix/issue-number`
+   - Write fix with tests
+   - Document the fix
+
+3. **Verification**
+   - Test fix thoroughly
+   - Add regression tests
+   - Update documentation if needed
+
+### Documentation Contributions
+
+Documentation is crucial for project success!
+
+#### Types of Documentation
+
+- **User Guides** - Installation, configuration, usage
+- **API Docs** - Javadoc comments, API reference
+- **Developer Docs** - Architecture, building, contributing
+- **Examples** - Code examples, use cases
+
+#### Documentation Standards
+
+<Checklist>
+- ✅ Clear and concise language
+- ✅ Step-by-step instructions
+- ✅ Code examples where helpful
+- ✅ Screenshots for UI features
+- ✅ Keep documentation up to date
+</Checklist>
+
+## Code Style Guidelines
+
+### Java Code Style
+
+Follow these conventions for consistent code style:
+
+```java
+// Class names: PascalCase
+public class AuthenticationManager {
+
+}
+
+// Method names: camelCase
+public void authenticatePlayer() {
+}
+
+// Constants: UPPER_SNAKE_CASE
+public static final int MAX_LOGIN_ATTEMPTS = 5;
+
+// Variables: camelCase
+private String playerName;
+
+// Indentation: 4 spaces
+// Line length: max 120 characters
+```
+
+### Documentation Comments
+
+Use Javadoc for public APIs:
+
+```java
+/**
+ * Authenticates a player with the given credentials.
+ *
+ * @param username the player's username
+ * @param password the player's password
+ * @return AuthResult containing authentication status
+ * @throws AuthenticationException if authentication fails
+ */
+public AuthResult authenticate(String username, String password) {
+    // Implementation
+}
+```
+
+### Code Organization
+
+```
+com.nexauth/
+├── core/           # Core functionality
+├── velocity/       # Velocity-specific code
+├── paper/          # Paper-specific code
+├── database/       # Database layer
+├── crypto/         # Security and encryption
+└── util/           # Utility classes
+```
+
+## Commit Guidelines
+
+### Commit Message Format
+
+Follow conventional commits:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation changes
+- `style` - Code style changes (formatting)
+- `refactor` - Code refactoring
+- `test` - Adding or updating tests
+- `chore` - Build process or auxiliary tool changes
+
+### Examples
+
+```bash
+# Feature
+git commit -m "feat(auth): add TOTP authentication support"
+
+# Bug fix
+git commit -m "fix(database): resolve connection leak in session manager"
+
+# Documentation
+git commit -m "docs(installation): update MySQL setup instructions"
+
+# Refactoring
+git commit -m "refactor(core): simplify authentication flow"
+```
+
+## Pull Request Guidelines
+
+### PR Title Format
+
+Use the same format as commit messages:
+
+```
+feat(auth): add TOTP authentication support
+fix(database): resolve connection leak
+docs(installation): update MySQL setup
+```
+
+### PR Description
+
+Include:
+
+- **Summary** - What changes were made and why
+- **Related Issue** - Link to related issue number
+- **Testing** - How changes were tested
+- **Breaking Changes** - Any breaking changes
+- **Screenshots** - For UI changes (if applicable)
+
+### PR Template
+
+```markdown
+## Summary
+Brief description of changes
+
+## Related Issue
+Fixes #123
+
+## Changes Made
+- Added feature X
+- Fixed bug Y
+- Updated documentation
+
+## Testing
+- Tested on Velocity 3.3.0
+- Tested on Paper 1.20.4
+- Added unit tests
+- Manual testing performed
+
+## Screenshots (if applicable)
+[Screenshots here]
+
+## Checklist
+- [ ] Code follows project style guidelines
+- [ ] Tests pass locally
+- [ ] Documentation updated
+- [ ] No breaking changes (or documented)
+```
+
+### Review Process
+
+1. **Automated Checks**
+   - CI/CD pipeline runs tests
+   - Code style verification
+   - Build verification
+
+2. **Code Review**
+   - Maintainer reviews code
+   - Feedback provided
+   - Changes requested if needed
+
+3. **Approval**
+   - At least one maintainer approval
+   - All checks pass
+   - PR merged into target branch
+
+## Issue Reporting
+
+### Bug Reports
+
+Use the bug report template:
+
+```markdown
+## Bug Description
+Clear description of the bug
+
+## Reproduction Steps
+1. Step one
+2. Step two
+3. Step three
+
+## Expected Behavior
+What should happen
+
+## Actual Behavior
+What actually happens
+
+## Environment
+- NexAuth version:
+- Velocity/Paper version:
+- Java version:
+- Database type:
+- Other relevant plugins:
+
+## Error Logs
+```
+[Paste error logs here]
+```
+
+## Additional Context
+Any other relevant information
+```
+
+### Feature Requests
+
+```markdown
+## Feature Description
+Clear description of the requested feature
+
+## Problem Statement
+What problem does this solve?
+
+## Proposed Solution
+How should this feature work?
+
+## Alternatives Considered
+Other approaches considered
+
+## Additional Context
+Examples, mockups, or other details
+```
+
+## Testing Guidelines
+
+### Unit Tests
+
+Write tests for new functionality:
+
+```java
+@Test
+public void testPlayerAuthentication() {
+    // Arrange
+    String username = "testplayer";
+    String password = "testpass123";
+    
+    // Act
+    AuthResult result = authManager.authenticate(username, password);
+    
+    // Assert
+    assertTrue(result.isSuccess());
+    assertEquals(username, result.getPlayer().getName());
+}
+```
+
+### Integration Tests
+
+Test component interactions:
+
+```java
+@Test
+public void testDatabaseAuthenticationFlow() {
+    // Setup test database
+    // Perform authentication
+    // Verify database state
+    // Cleanup
+}
+```
+
+### Test Coverage
+
+Aim for high test coverage:
+
+- Unit tests: 80%+ coverage
+- Integration tests: Critical paths covered
+- Manual testing: Before major releases
+
+## Project Communication
+
+### Channels
+
+- **GitHub Issues** - Bug reports, feature requests
+- **GitHub Discussions** - Questions, ideas
+- **Pull Requests** - Code contributions
+- **Discord** - Real-time communication (coming soon)
+
+### Getting Help
+
+1. Search existing issues and discussions
+2. Ask in GitHub Discussions
+3. Join Discord (when available)
+4. Create issue if bug or feature request
+
+## Recognition
+
+Contributors are recognized in:
+
+- `CONTRIBUTORS.md` - All contributors
+- Release notes - Major contributors
+- Documentation - Tutorial authors
+- GitHub - Contributor statistics
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the [MIT License](https://github.com/XreatLabs/NexAuth/blob/main/LICENSE).
+
+## Code of Conduct
+
+Be respectful and constructive:
+
+- Use inclusive language
+- Provide constructive feedback
+- Welcome new contributors
+- Focus on what is best for the community
+- Show empathy towards other community members
+
+## Getting Started
+
+<Card title="Ready to contribute?" icon="rocket" href="https://github.com/XreatLabs/NexAuth/issues">
+Browse existing issues and start contributing today!
+</Card>
+
+## Questions?
+
+<Card title="Need Help?" icon="users" href="https://github.com/XreatLabs/NexAuth/discussions">
+Ask questions in GitHub Discussions.
+</Card>

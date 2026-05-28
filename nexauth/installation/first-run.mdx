@@ -1,0 +1,321 @@
+---
+title: First Run Configuration
+description: Step-by-step guide to configuring NexAuth for the first time
+---
+
+# First Run Configuration
+
+This guide walks you through the initial configuration of NexAuth after your first startup.
+
+## What Happens on First Run
+
+When you start NexAuth for the first time:
+
+1. The plugin generates a default `config.conf` file
+2. It automatically shuts down the server
+3. This is normal - we need to configure it before full operation
+
+<Callout type="info">
+  The automatic shutdown after first startup is intentional. NexAuth generates a default configuration file that you should review before running the plugin.
+</Callout>
+
+## Understanding the Generated Config
+
+After first shutdown, you'll find `plugins/NexAuth/config.conf` with these main sections:
+
+```hocon
+# !!THIS FILE IS WRITTEN IN THE HOCON FORMAT!!
+# The hocon format is very similar to JSON, but it has some extra features.
+
+# Database configuration
+database {
+    type=nexauth-sqlite
+}
+
+# Premium auto-register
+auto-register=false
+
+# Profile conflict resolution
+profile-conflict-resolution-strategy=BLOCK
+
+# Default crypto provider (BCrypt-2A recommended)
+default-crypto-provider=BCrypt-2A
+
+# Debug mode
+debug=false
+
+# TOTP 2FA
+totop {
+    enabled=false
+}
+```
+
+## Essential Configuration Steps
+
+### 1. Set Your Deployment Mode
+
+Choose the correct mode for your setup:
+
+```hocon
+# NexAuth works on both Velocity and Paper
+# No mode configuration needed - single JAR works for both
+```
+
+### 2. Configure Online/Premium Mode
+
+```hocon
+# Should we automatically register all players with a premium nickname?
+auto-register=false
+
+# Profile conflict resolution strategy
+profile-conflict-resolution-strategy=BLOCK
+```
+
+<Callout type="warning">
+  **Important:** `online-mode=false` is required wherever NexAuth is installed.
+</Callout>
+
+### 3. Registration and Login Commands
+
+Customize the commands players use:
+
+```hocon
+# Commands that are allowed while the user is not authorized
+allowed-commands-while-unauthorized=[
+    login,
+    register,
+    "2fa",
+    "2faconfirm",
+    l,
+    log,
+    reg
+]
+```
+
+### 4. Database Configuration
+
+<Tabs>
+  <Tab label="SQLite (Default)">
+    Perfect for small servers and development setups. No additional services required.
+
+    ```hocon
+    database {
+        type=nexauth-sqlite
+        sqlite {
+            path="user-data.db"
+        }
+    }
+    ```
+
+    **Advantages:**
+    - ✅ No setup required
+    - ✅ No additional services
+    - ✅ Easy to backup (just copy the .db file)
+    - ✅ Good for small servers (< 100 players)
+  </Tab>
+
+  <Tab label="MySQL/MariaDB">
+    Recommended for medium to large servers and production environments.
+
+    ```hocon
+    database {
+        type=nexauth-mysql
+        properties {
+            mysql {
+                host=localhost
+                database=nexauth
+                password="your_password"
+                port=3306
+                user=root
+            }
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab label="PostgreSQL">
+    Recommended for enterprise environments and servers requiring advanced features.
+
+    ```hocon
+    database {
+        type=nexauth-postgresql
+        properties {
+            postgresql {
+                host=localhost
+                database=nexauth
+                password="your_password"
+                port=5432
+                user=root
+            }
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### 5. Adjust Registration Settings
+
+```hocon
+# Sets the login/register time limit in seconds. Set to negative to disable.
+seconds-to-authorize=-1
+
+# The minimum length of a password. Set to negative to disable.
+minimum-password-length=-1
+
+# The minimum length the player's name can have.
+minimum-username-length=-1
+```
+
+## Advanced Configuration
+
+### TOTP Two-Factor Authentication
+
+```hocon
+totp {
+    # Should we enable TOTP-Based Two-Factor Authentication?
+    enabled=true
+    # The label to be displayed in the 2FA app.
+    label="NexAuth Network"
+    # The delay in milliseconds until player is given a map to scan the QR code.
+    delay=1000
+}
+```
+
+### Debug Mode
+
+Set debug level for troubleshooting:
+```hocon
+# Should we enable debug mode? This will print out debug messages to the console.
+debug=true
+```
+
+<Callout type="warning">
+  Only enable debug level 2 or 3 when troubleshooting. Higher debug levels can impact performance and generate large log files.
+</Callout>
+
+### Rate Limiting
+
+```hocon
+# Sets the maximum amount of accounts that can be registered from the same IP address.
+# Set to zero or less to disable.
+ip-limit=-1
+
+# Kick the player, if the password was incorrect more or equal times. -1 means disabled
+max-login-attempts=-1
+```
+
+## After Configuration
+
+### Save and Test
+
+1. Save your `config.conf` changes
+2. Start your server (Velocity or Paper/Purpur)
+3. Test with both premium and offline accounts
+
+### Verify Database Connection
+
+Check your server logs for:
+- Database connection successful
+- No SQL errors
+- User table creation
+
+### Test Player Experience
+
+Have players test:
+- Premium account auto-login
+- Offline account registration
+- Login commands
+- Any TOTP setup (if enabled)
+
+## Common Configuration Issues
+
+### Database Connection Failed
+
+- Check database server is running
+- Verify connection details
+- Ensure database user has proper permissions
+
+### Commands Not Working
+
+- Check for plugin conflicts
+- Verify command syntax in config
+- Check server logs for errors
+
+### Players Getting Kicked
+
+- Ensure `online-mode=false` is set correctly
+- Check `register-delay` is adequate
+- Verify no conflicting plugins
+
+## Recommended First Setup
+
+<Tabs>
+  <Tab label="New Servers">
+    Basic setup for new servers
+
+    ```hocon
+    # Basic setup for new servers
+    database {
+        type=nexauth-sqlite
+        sqlite {
+            path="user-data.db"
+        }
+    }
+    auto-register=false
+    profile-conflict-resolution-strategy=BLOCK
+    default-crypto-provider=BCrypt-2A
+    debug=true
+    minimum-password-length=-1
+    totp {
+        enabled=false
+    }
+    ```
+  </Tab>
+
+  <Tab label="Production Servers">
+    Production-ready configuration
+
+    ```hocon
+    # Production-ready configuration
+    database {
+        type=nexauth-mysql
+        properties {
+            mysql {
+                host="db-server.example.com"
+                database=nexauth_prod
+                password="SECURE_PASSWORD_HERE"
+                port=3306
+                user=nexauth_user
+            }
+        }
+    }
+    auto-register=false
+    profile-conflict-resolution-strategy=BLOCK
+    default-crypto-provider=BCrypt-2A
+    debug=false
+    minimum-password-length=8
+    ip-limit=3
+    max-login-attempts=5
+    totp {
+        enabled=false
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Getting Help
+
+If you run into issues:
+
+1. Check the [troubleshooting guides](./velocity.mdx#troubleshooting)
+2. Review [database setup](./database.mdx) for database-specific issues
+3. Check server logs for error messages
+4. Visit [GitHub Issues](https://github.com/xreatlabs/NexAuth/issues) for support
+
+## Next Steps
+
+Once you have the basic configuration working:
+
+- 📖 [Database setup](./database.mdx) for performance optimization
+- 📖 [Installation guides](./overview.mdx) for deployment options
+- 📖 Advanced configuration topics (coming soon)

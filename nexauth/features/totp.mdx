@@ -1,0 +1,67 @@
+---
+title: "TOTP Two-Factor Authentication"
+description: "Add an extra layer of security with time-based one-time passwords"
+icon: 'smartphone'
+---
+
+# TOTP Two-Factor Authentication
+
+NexAuth supports TOTP (Time-based One-Time Password) two-factor authentication, adding an extra layer of security to player accounts.
+
+## Overview
+
+TOTP 2FA requires players to provide a code from their authenticator app in addition to their password, preventing unauthorized access even if passwords are compromised.
+
+<Features>
+  <Feature 
+    icon="smartphone"
+    title="Authenticator App Support"
+    description="Works with Google Authenticator, Authy, and other TOTP apps."
+  />
+  <Feature 
+    icon="qr-code"
+    title="Easy Setup"
+    description="QR code generation for quick and simple setup."
+  />
+  <Feature 
+    icon="shield"
+    title="Backup Codes"
+    description="Recovery codes for account access if you lose your device."
+  />
+</Features>
+
+## Configuration
+
+```hocon
+totp {
+    # Should we enable TOTP-Based Two-Factor Authentication? If you don't know what this is, this is the 2FA used in applications like Google Authenticator etc.
+    enabled=true
+    # The label to be displayed in the 2FA app. Change this to your network name.
+    label="NexAuth Network"
+    # The delay in milliseconds until player is given a map to scan the QR code. Increase this value if the map disappears too quickly.
+    delay=1000
+}
+```
+
+## Player Commands
+
+```bash
+/totp enable
+/totp disable <password>
+/totp verify <code>
+/totp backup-codes
+```
+
+## Setup Process
+
+1. Player runs `/totp enable`
+2. QR code is displayed
+3. Player scans with authenticator app
+4. Player enters verification code
+5. 2FA is enabled
+
+## Next Steps
+
+<Card title="Session Management" icon="clock" href="/nexauth/features/sessions">
+Learn about session persistence and management.
+</Card>

@@ -1,0 +1,135 @@
+---
+title: "Account Commands"
+description: "Player account management and profile commands"
+icon: 'user'
+---
+
+# Account Commands
+
+Advanced player account management commands for profile customization and data management.
+
+## Profile Commands
+
+### `/account info`
+
+Display detailed account information.
+
+```bash
+/account info
+```
+
+**Note:** This is the main account command. Other account commands are:
+- `/account email` - Manage email address
+- `/account delete` - Request account deletion
+- `/account export` - Export account data
+- `/account privacy` - Manage privacy settings
+- `/account preferences` - Set account preferences
+
+**Shows:**
+- Account UUID
+- Registration date
+- Last login details
+- Premium status
+- 2FA status
+- Email address (if set)
+
+### `/account email`
+
+Manage account email address.
+
+```bash
+/account email set <email>
+/account email remove
+/account email verify <code>
+```
+
+**Email Features:**
+- Password recovery (if enabled)
+- Account notifications
+- Security alerts
+
+### `/account delete`
+
+Request account deletion.
+
+```bash
+/account delete <confirmation>
+```
+
+**Process:**
+1. Enter command with confirmation
+2. Grace period (configurable)
+3. Final confirmation required
+4. Data deletion
+
+## Data Management
+
+### `/account export`
+
+Export account data.
+
+```bash
+/account export [format]
+```
+
+**Formats:** `json`, `csv`, `yaml`
+
+**Includes:**
+- Profile data
+- Login history
+- Session data
+- 2FA backup codes
+
+### `/account privacy`
+
+Manage privacy settings.
+
+```bash
+/account privacy show-email <true/false>
+/account privacy show-last-login <true/false>
+/account privacy show-play-time <true/false>
+```
+
+## Preferences
+
+### `/account preferences`
+
+Set account preferences.
+
+```bash
+/account preferences
+```
+
+**Options:**
+- Language selection
+- Notification settings
+- Security preferences
+- Display options
+
+## Configuration
+
+```hocon
+# Email configuration
+mail {
+    # Should we enable the email password recovery feature?
+    enabled=false
+    # The host of the SMTP server.
+    host="smtp.gmail.com"
+    # The port of the SMTP server.
+    port=587
+    # The username used to login to the SMTP server.
+    username=username
+    # The password used to login to the SMTP server.
+    password=password
+    # The sender of the email.
+    sender="NexAuth Network"
+    # The email to use as a sender in the From field.
+    email="email@something.com"
+}
+```
+
+## Next Steps
+
+<Card title="2FA Commands" icon="smartphone" href="/nexauth/commands/2fa">
+Two-factor authentication commands.
+</Card>

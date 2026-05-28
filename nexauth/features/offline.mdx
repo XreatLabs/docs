@@ -1,0 +1,73 @@
+---
+title: "Offline Mode Authentication"
+description: "Secure password-based authentication for offline/cracked Minecraft servers"
+icon: 'user'
+---
+
+# Offline Mode Authentication
+
+NexAuth provides secure, feature-rich offline mode authentication for servers that don't use Minecraft's premium authentication system.
+
+## Overview
+
+Offline mode allows players to authenticate using usernames and passwords without requiring premium Minecraft accounts. NexAuth implements industry-standard security practices to protect player accounts.
+
+<Features>
+  <Feature 
+    icon="shield"
+    title="Secure Password Hashing"
+    description="Uses bcrypt with adaptive work factor for secure password storage."
+  />
+  <Feature 
+    icon="lock"
+    title="Strong Encryption"
+    description="AES-256 encryption for sensitive data storage and transmission."
+  />
+  <Feature 
+    icon="user-check"
+    title="Account Management"
+    description="Full player account management with registration, login, and recovery."
+  />
+</Features>
+
+## Configuration
+
+### Basic Setup
+
+```hocon
+# The default crypto provider. This is used for hashing passwords. Available Providers:
+# BCrypt-2A - Newer, more safe, recommended
+# Argon-2ID - Newest, should be safer than BCrypt-2A, however, it can slow down the server
+# SHA-256 - Older, not recommended. Kept for compatibility reasons
+# SHA-512 - More safer than SHA-256, but still not recommended
+default-crypto-provider=BCrypt-2A
+
+# The minimum length of a password. Set to negative to disable.
+minimum-password-length=-1
+
+# Kick the player, if the password was incorrect more or equal times. -1 means disabled
+max-login-attempts=-1
+```
+
+## Player Commands
+
+```bash
+/register <password> <confirm_password>
+/login <password> or /l <password>
+/changepassword <old> <new>
+/logout
+/unregister <password>
+```
+
+## Security Features
+
+- **Bcrypt Hashing** - Industry-standard password hashing
+- **Brute Force Protection** - Account lockout after failed attempts
+- **Session Management** - Secure session handling
+- **IP Logging** - Track login IP addresses
+
+## Next Steps
+
+<Card title="TOTP 2FA" icon="smartphone" href="/nexauth/features/totp">
+Add two-factor authentication for enhanced security.
+</Card>

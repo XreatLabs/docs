@@ -1,0 +1,440 @@
+---
+title: "Building from Source"
+description: "Build and compile NexAuth for development and contribution"
+icon: 'hammer'
+---
+
+# Building from Source
+
+Complete guide to building NexAuth from source code for development and contribution.
+
+## Prerequisites
+
+<Checklist>
+- **Java 17+** - Required for compilation
+- **Maven 3.6+** or **Gradle 7.0+** - Build tools
+- **Git** - Version control
+- **IDE** - IntelliJ IDEA recommended
+</Checklist>
+
+## Repository Setup
+
+<Steps>
+<Step title="Clone Repository">
+Clone the NexAuth repository from GitHub.
+
+```bash
+git clone https://github.com/XreatLabs/NexAuth.git
+cd NexAuth
+```
+
+</Step>
+
+<Step title="Choose Branch">
+Select the branch you want to build.
+
+```bash
+# Development branch (latest features)
+git checkout develop
+
+# Stable release branch
+git checkout main
+
+# Specific version
+git checkout tags/v1.0.0
+```
+
+</Step>
+
+<Step title="Configure Build">
+Configure build properties if needed.
+
+```bash
+# Edit build.gradle.kts or pom.xml
+# Customize version, dependencies, etc.
+```
+
+</Step>
+</Steps>
+
+## Building with Gradle
+
+### Basic Build
+
+```bash
+# Build all modules
+./gradlew build
+
+# Build without tests
+./gradlew build -x test
+
+# Build specific module
+./gradlew :Plugin:build
+
+# Clean and build
+./gradlew clean build
+```
+
+### Build Outputs
+
+Build artifacts are located in:
+
+```
+# Universal plugin (works on both Velocity and Paper/Purpur)
+Plugin/build/libs/NexAuth.jar
+
+# API jar
+API/build/libs/NexAuth-API-x.x.x.jar
+```
+
+<Callout type="info">
+  NexAuth produces a single universal JAR that works on both Velocity proxies and Paper/Purpur servers - no platform-specific builds needed.
+</Callout>
+
+### Development Build
+
+```bash
+# Build with dependencies and sources
+./gradlew build shadowJar
+
+# Output includes:
+# - Standard jar
+# - Shadow jar (with dependencies)
+# - Sources jar
+# - Javadoc jar
+```
+
+## Building with Maven
+
+### Basic Build
+
+```bash
+# Build all modules
+mvn clean install
+
+# Build without tests
+mvn clean install -DskipTests
+
+# Build specific module
+mvn clean install -pl Plugin
+
+# Package only
+mvn clean package
+```
+
+### Build Outputs
+
+```
+# Universal plugin (works on both Velocity and Paper/Purpur)
+Plugin/target/NexAuth.jar
+
+# API jar
+API/target/NexAuth-API-x.x.x.jar
+```
+
+<Callout type="info">
+  NexAuth produces a single universal JAR that works on both Velocity proxies and Paper/Purpur servers - no platform-specific builds needed.
+</Callout>
+
+## IDE Setup
+
+### IntelliJ IDEA
+
+<Steps>
+<Step title="Import Project">
+Open IntelliJ and select "Import Project"
+
+Choose the NexAuth directory
+</Step>
+
+<Step title="Select Build System">
+Choose Gradle or Maven as the build system
+
+Let IntelliJ auto-import dependencies
+</Step>
+
+<Step title="Configure SDK">
+Set Project SDK to Java 17+
+
+Set Language Level to 17
+</Step>
+
+<Step title="Enable Annotation Processing">
+Settings → Build, Execution, Deployment → Compiler → Annotation Processors
+
+Enable "Enable annotation processing"
+</Step>
+
+<Step title="Run Configuration">
+Create run configurations for testing:
+
+- Velocity: Run Velocity proxy
+- Paper: Run Paper server
+- Tests: Run unit tests
+</Step>
+
+</Steps>
+
+### VS Code
+
+<Steps>
+<Step title="Install Extensions">
+Install these VS Code extensions:
+
+- Extension Pack for Java
+- Gradle for Java
+- Maven for Java
+- Code Spell Checker
+</Step>
+
+<Step title="Open Project">
+Open the NexAuth directory in VS Code
+
+</Step>
+
+<Step title="Import Build">
+VS Code will automatically detect Gradle/Maven and import dependencies
+
+</Step>
+
+<Step title="Configure Settings">
+Ensure Java 17+ is configured in settings.json
+
+</Step>
+</Steps>
+
+## Testing
+
+### Unit Tests
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run specific test class
+./gradlew test --tests "com.nexauth.AuthTest"
+
+# Run with coverage
+./gradlew test jacocoTestReport
+```
+
+### Integration Tests
+
+```bash
+# Run integration tests
+./gradlew integrationTest
+
+# Run specific integration test
+./gradlew integrationTest --tests "com.nexauth.DatabaseIntegrationTest"
+```
+
+### Test Database Setup
+
+Configure test database in `src/test/resources/test-config.conf`:
+
+```hocon
+database {
+    type="h2"  # Use H2 for testing
+    path="mem:testdb"
+}
+```
+
+## Development Workflow
+
+### Making Changes
+
+<Steps>
+<Step title="Create Feature Branch">
+```bash
+git checkout -b feature/your-feature-name
+```
+
+</Step>
+
+<Step title="Make Changes">
+Edit source files in your IDE
+
+Make sure to follow code style guidelines
+</Step>
+
+<Step title="Build and Test">
+```bash
+# Build changes
+./gradlew build
+
+# Run tests
+./gradlew test
+```
+
+</Step>
+
+<Step title="Commit Changes">
+```bash
+git add .
+git commit -m "feat: add your feature description"
+```
+
+</Step>
+
+<Step title="Push and PR">
+```bash
+git push origin feature/your-feature-name
+# Create Pull Request on GitHub
+```
+
+</Step>
+</Steps>
+
+### Debugging
+
+#### Debug Server Startup
+
+```bash
+# Build with debug enabled
+./gradlew build -Pdebug
+
+# Run with debug logging
+# Add -Dnexauth.debug=3 to server startup
+```
+
+#### Debug in IDE
+
+1. Set breakpoints in your code
+2. Start server in debug mode
+3. Attach debugger to server process
+4. Debug code execution
+
+## Continuous Integration
+
+### GitHub Actions
+
+NexAuth uses GitHub Actions for CI/CD:
+
+```yaml
+# .github/workflows/build.yml
+name: Build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Run tests
+        run: ./gradlew test
+```
+
+### Local CI Testing
+
+```bash
+# Run CI pipeline locally
+act push  # Using act for local GitHub Actions
+
+# Or run build script
+./scripts/ci-build.sh
+```
+
+## Release Building
+
+### Build Release Artifacts
+
+```bash
+# Build release version
+./gradlew clean build release
+
+# Generate release notes
+./scripts/generate-release-notes.sh
+
+# Create GitHub release
+gh release create v1.0.0 \
+  Plugin/build/libs/*.jar \
+  --notes-file RELEASE_NOTES.md
+```
+
+### Version Management
+
+```bash
+# Update version in build files
+./gradlew setVersion -PnewVersion=1.0.0
+
+# Commit version change
+git commit -am "chore: bump version to 1.0.0"
+
+# Create version tag
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Build fails with dependency errors?">
+
+**Solution:**
+```bash
+# Clean and rebuild
+./gradlew clean build --refresh-dependencies
+
+# Clear Gradle cache
+rm -rf ~/.gradle/caches/
+./gradlew build
+```
+
+</Accordion>
+
+<Accordion title="Tests fail locally?">
+
+**Possible causes:**
+1. Database not configured
+2. Port conflicts
+3. Missing test resources
+
+**Solutions:**
+```bash
+# Use H2 for testing
+# Configure in test-config.yml
+
+# Run tests in order
+./gradlew test --tests "*Test*"
+
+# Check test logs
+cat build/reports/tests/test/index.html
+```
+
+</Accordion>
+
+<Accordion title="IDE can't find dependencies?">
+
+**Solution:**
+```bash
+# Refresh Gradle project
+./gradlew --refresh-dependencies
+
+# Reimport project in IDE
+# IntelliJ: File → Invalidate Caches → Invalidate and Restart
+```
+
+</Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Checklist>
+- ✅ Write tests for new features
+- ✅ Follow code style guidelines
+- ✅ Update documentation
+- ✅ Test on both Velocity and Paper
+- ✅ Use meaningful commit messages
+- ✅ Keep PRs focused and small
+</Checklist>
+
+## Next Steps
+
+<Card title="Contributing Guidelines" icon="users" href="/nexauth/developers/contributing">
+Learn how to contribute to NexAuth development.
+</Card>

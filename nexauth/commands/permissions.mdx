@@ -1,0 +1,206 @@
+---
+title: "Permissions Reference"
+description: "Complete permission nodes for NexAuth commands and features"
+icon: 'key'
+---
+
+# Permissions Reference
+
+Complete list of permission nodes for configuring NexAuth access control.
+
+## Player Permissions
+
+### Basic Authentication
+
+```yaml
+nexauth.player.login: true
+nexauth.player.register: true
+nexauth.player.logout: true
+nexauth.player.changepassword: true
+nexauth.player.unregister: true
+```
+
+### Account Management
+
+```yaml
+nexauth.player.account.info: true
+nexauth.player.account.email: true
+nexauth.player.account.export: true
+nexauth.player.account.delete: true
+```
+
+### Two-Factor Authentication
+
+```yaml
+nexauth.totp.enable: true
+nexauth.totp.disable: true
+nexauth.totp.verify: true
+nexauth.totp.backup-codes: true
+```
+
+### Premium Features
+
+```yaml
+nexauth.premium.status: true
+nexauth.premium.link: true
+nexauth.premium.unlink: true
+nexauth.premium.skin: true
+```
+
+## Admin Permissions
+
+### Player Management
+
+```yaml
+nexauth.admin.account: true
+nexauth.admin.changepassword: true
+nexauth.admin.unregister: true
+nexauth.admin.account.info: true
+nexauth.admin.account.delete: true
+```
+
+### Session Management
+
+```yaml
+nexauth.admin.sessions: true
+nexauth.admin.sessions.list: true
+nexauth.admin.sessions.revoke: true
+nexauth.admin.sessions.revoke-all: true
+```
+
+### Premium Management
+
+```yaml
+nexauth.admin.premium: true
+nexauth.admin.premium.set: true
+nexauth.admin.premium.check: true
+nexauth.admin.premium.sync: true
+```
+
+### Database Operations
+
+```yaml
+nexauth.admin.database: true
+nexauth.admin.database.backup: true
+nexauth.admin.database.restore: true
+nexauth.admin.database.optimize: true
+```
+
+### Import/Export
+
+```yaml
+nexauth.admin.import: true
+nexauth.admin.export: true
+nexauth.admin.import.*: true  # All import types
+```
+
+### Configuration
+
+```yaml
+nexauth.admin.reload: true
+nexauth.admin.debug: true
+nexauth.admin.stats: true
+```
+
+## Wildcard Permissions
+
+### Full Access
+
+```yaml
+# All player permissions
+nexauth.player.*: true
+
+# All admin permissions
+nexauth.admin.*: true
+
+# All permissions (use carefully)
+nexauth.*: true
+```
+
+## Permission Examples
+
+### Default Player
+
+```yaml
+# Basic authentication
+nexauth.player.login: true
+nexauth.player.register: true
+nexauth.player.logout: true
+nexauth.player.changepassword: true
+
+# Account info
+nexauth.player.account.info: true
+
+# Optional features
+nexauth.totp.enable: true
+nexauth.premium.status: true
+```
+
+### Moderator
+
+```yaml
+# Player permissions
+nexauth.player.*: true
+
+# Limited admin permissions
+nexauth.admin.account.info: true
+nexauth.admin.sessions.list: true
+nexauth.admin.stats: true
+```
+
+### Administrator
+
+```yaml
+# All permissions
+nexauth.*: true
+```
+
+## Configuration Integration
+
+### LuckPerms Example
+
+```yaml
+# groups/default.yml
+permissions:
+  - nexauth.player.login
+  - nexauth.player.register
+  - nexauth.player.logout
+  - nexauth.player.changepassword
+  - nexauth.player.account.info
+
+# groups/admin.yml
+permissions:
+  - nexauth.*
+```
+
+### PermissionsEX Example
+
+```yaml
+groups:
+  default:
+    permissions:
+    - nexauth.player.login
+    - nexauth.player.register
+    - nexauth.player.logout
+    - nexauth.player.changepassword
+  
+  admin:
+    permissions:
+    - nexauth.*
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Grant minimum required permissions
+- ✅ Use wildcard permissions carefully
+- ✅ Regular permission audits
+- ✅ Document custom permission setups
+- ✅ Test permission changes
+</Checklist>
+
+## Next Steps
+
+<Card title="API Overview" icon="book" href="/nexauth/api/overview">
+Developer API and integration documentation.
+</Card>

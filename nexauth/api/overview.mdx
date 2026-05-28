@@ -1,0 +1,358 @@
+---
+title: "API Overview"
+description: "Introduction to the NexAuth API for developers and integrations"
+icon: 'book'
+---
+
+# API Overview
+
+The NexAuth API provides comprehensive interfaces for integrating authentication functionality into your plugins and applications.
+
+## Getting Started
+
+### Dependency
+
+Add NexAuth as a dependency in your build file:
+
+**Gradle:**
+```gradle
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly 'com.github.XreatLabs:NexAuth:API:x.x.x'
+}
+```
+
+**Maven:**
+```xml
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.XreatLabs</groupId>
+    <artifactId>NexAuth-API</artifactId>
+    <version>x.x.x</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+### Basic Usage
+
+```java
+import com.nexauth.api.NexAuthAPI;
+import com.nexauth.api.AuthResult;
+import com.nexauth.api.PlayerAccount;
+
+public class MyPlugin extends JavaPlugin {
+    private NexAuthAPI nexauth;
+    
+    @Override
+    public void onEnable() {
+        // Get NexAuth API instance
+        nexauth = NexAuthAPI.getInstance();
+        
+        // Check if NexAuth is loaded
+        if (!nexauth.isEnabled()) {
+            getLogger().warning("NexAuth not found!");
+            return;
+        }
+    }
+    
+    public void checkAuth(Player player) {
+        // Check if player is authenticated
+        if (nexauth.isAuthenticated(player)) {
+            player.sendMessage("You are authenticated!");
+        }
+    }
+}
+```
+
+## Core Components
+
+### Authentication Manager
+
+Handle player authentication operations:
+
+```java
+AuthManager authManager = nexauth.getAuthManager();
+
+// Authenticate player
+AuthResult result = authManager.authenticate(player, "password");
+
+if (result.isSuccess()) {
+    // Authentication successful
+} else {
+    // Handle failure
+    player.sendMessage(result.getErrorMessage());
+}
+
+// Register new player
+AuthResult registerResult = authManager.register(player, "password");
+
+// Check authentication status
+boolean authenticated = authManager.isAuthenticated(player);
+
+// Get player account
+Optional<PlayerAccount> account = authManager.getAccount(player);
+```
+
+### Session Manager
+
+Manage player sessions:
+
+```java
+SessionManager sessionManager = nexauth.getSessionManager();
+
+// Create session
+Session session = sessionManager.createSession(player, Duration.ofHours(24));
+
+// Get session
+Optional<Session> session = sessionManager.getSession(player);
+
+// Validate session
+boolean valid = sessionManager.validateSession(player, ipAddress);
+
+// Invalidate session
+sessionManager.invalidateSession(player);
+```
+
+### Event System
+
+Listen to authentication events:
+
+```java
+import com.nexauth.api.events.PlayerLoginEvent;
+import com.nexauth.api.events.PlayerRegisterEvent;
+import com.nexauth.api.events.SessionExpireEvent;
+
+public class AuthListener implements Listener {
+    
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        
+        if (event.isSuccess()) {
+            getLogger().info(player.getName() + " logged in successfully");
+        } else {
+            getLogger().warning(player.getName() + " failed to login");
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerRegister(PlayerRegisterEvent event) {
+        Player player = event.getPlayer();
+        getLogger().info(player.getName() + " registered new account");
+    }
+    
+    @EventHandler
+    public void onSessionExpire(SessionExpireEvent event) {
+        Session session = event.getSession();
+        getLogger().info("Session expired for " + session.getPlayerName());
+    }
+}
+```
+
+## API Features
+
+### Player Account API
+
+```java
+PlayerAccount account = nexauth.getAuthManager().getAccount(player).orElse(null);
+
+if (account != null) {
+    // Account information
+    UUID uuid = account.getUUID();
+    String username = account.getUsername();
+    long registeredAt = account.getRegisteredAt();
+    long lastLogin = account.getLastLogin();
+    
+    // Account status
+    boolean isPremium = account.isPremium();
+    boolean has2FA = account.hasTwoFactorAuth();
+    
+    // Account operations
+    account.changePassword("newPassword");
+    account.enableTwoFactorAuth("secret");
+    account.disableTwoFactorAuth();
+}
+```
+
+### Premium Authentication
+
+```java
+PremiumManager premiumManager = nexauth.getPremiumManager();
+
+// Check premium status
+boolean isPremium = premiumManager.isPremium(player);
+
+// Get premium UUID
+Optional<UUID> premiumUUID = premiumManager.getPremiumUUID(username);
+
+// Force premium refresh
+premiumManager.refreshPremiumData(player);
+
+// Link premium account
+premiumManager.linkPremiumAccount(player, offlineUsername);
+```
+
+### Two-Factor Authentication
+
+```java
+TOTPManager totpManager = nexauth.getTOTPManager();
+
+// Enable 2FA
+String secret = totpManager.generateSecret(player);
+totpManager.enableTOTP(player, secret);
+
+// Verify code
+boolean valid = totpManager.verifyCode(player, "123456");
+
+// Generate backup codes
+List<String> backupCodes = totpManager.generateBackupCodes(player);
+
+// Disable 2FA
+totpManager.disableTOTP(player);
+```
+
+## Advanced Usage
+
+### Custom Authentication Provider
+
+```java
+public class CustomAuthProvider implements AuthProvider {
+    
+    @Override
+    public AuthResult authenticate(String username, String password) {
+        // Custom authentication logic
+        if (verifyWithCustomSystem(username, password)) {
+            return AuthResult.success();
+        } else {
+            return AuthResult.failure("Invalid credentials");
+        }
+    }
+    
+    @Override
+    public boolean isPremium(String username) {
+        // Custom premium check
+        return checkPremiumStatus(username);
+    }
+    
+    // Implement other methods...
+}
+
+// Register custom provider
+nexauth.registerProvider("custom", new CustomAuthProvider());
+```
+
+### Database Integration
+
+```java
+DatabaseManager dbManager = nexauth.getDatabaseManager();
+
+// Execute custom queries
+dbManager.executeQuery("SELECT * FROM custom_table", (resultSet) -> {
+    while (resultSet.next()) {
+        // Process results
+    }
+});
+
+// Batch operations
+dbManager.executeBatch(statements -> {
+    statements.add("INSERT INTO table (...) VALUES (...)");
+    statements.add("UPDATE table SET ...");
+});
+
+// Transactions
+dbManager.executeTransaction(() -> {
+    // Multiple related operations
+});
+```
+
+## Plugin Integration
+
+### Vault Integration
+
+```java
+// NexAuth provides Vault integration for economy permissions
+// Use Vault's Chat and Permission hooks with authenticated players
+
+Permission perms = getServer().getServicesManager()
+    .getRegistration(Permission.class).getProvider();
+
+// Check if player is authenticated before permission checks
+if (nexauth.getAuthManager().isAuthenticated(player)) {
+    // Player is authenticated, apply permissions
+    perms.playerAdd(player, "permission.node");
+}
+```
+
+### PlaceholderAPI Integration
+
+```java
+// NexAuth provides PlaceholderAPI placeholders
+// Use these in other plugins or scripts
+
+// %nexauth_authenticated% - Authentication status
+// %nexauth_premium% - Premium status
+// %nexauth_2fa_enabled% - 2FA status
+// %nexauth_registered_date% - Registration date
+// %nexauth_last_login% - Last login time
+
+String placeholder = PlaceholderAPI
+    .setPlaceholders(player, "%nexauth_authenticated%");
+```
+
+## Error Handling
+
+```java
+try {
+    AuthResult result = authManager.authenticate(player, password);
+    
+    if (result.isSuccess()) {
+        // Success
+    } else {
+        // Handle specific error
+        switch (result.getErrorType()) {
+            case INVALID_PASSWORD:
+                player.sendMessage("Incorrect password");
+                break;
+            case ACCOUNT_LOCKED:
+                player.sendMessage("Account is locked");
+                break;
+            case DATABASE_ERROR:
+                player.sendMessage("Authentication error");
+                break;
+        }
+    }
+} catch (NexAuthException e) {
+    // Handle exceptions
+    getLogger().severe("Authentication error: " + e.getMessage());
+}
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Check if NexAuth is loaded before using API
+- ✅ Handle authentication results gracefully
+- ✅ Use async operations for database calls
+- ✅ Listen to events for reactive behavior
+- ✅ Validate input before API calls
+- ✅ Handle exceptions appropriately
+</Checklist>
+
+## Support
+
+<Card title="API Support" icon="users" href="https://github.com/XreatLabs/NexAuth/discussions">
+Get help with API integration on GitHub Discussions.
+</Card>
+
+## Next Steps
+
+<Card title="Providers API" icon="cogs" href="/nexauth/api/providers">
+Learn about authentication providers.
+</Card>

@@ -1,0 +1,399 @@
+---
+title: "Database API"
+description: "Database abstraction layer for custom data storage and queries"
+icon: 'database'
+---
+
+# Database API
+
+NexAuth provides a database abstraction layer supporting multiple database backends with a unified API.
+
+## Supported Databases
+
+<Columns cols={3}>
+<Card title="MySQL/MariaDB" icon="database" recommended={true}>
+Production-ready with excellent performance.
+</Card>
+<Card title="PostgreSQL" icon="storage">
+Advanced features and great scalability.
+</Card>
+<Card title="H2" icon="file">
+Testing and development only.
+</Card>
+</Columns>
+
+## Database Interface
+
+### Basic Operations
+
+```java
+DatabaseManager dbManager = NexAuthAPI.getInstance().getDatabaseManager();
+
+// Execute query
+dbManager.executeQuery("SELECT * FROM players WHERE username = ?", (resultSet) -> {
+    while (resultSet.next()) {
+        String username = resultSet.getString("username");
+        // Process results
+    }
+}, username);
+
+// Execute update
+int affected = dbManager.executeUpdate(
+    "UPDATE players SET last_login = ? WHERE username = ?",
+    System.currentTimeMillis(), username
+);
+
+// Execute batch
+dbManager.executeBatch((batch) -> {
+    batch.addStatement("INSERT INTO players (...) VALUES (...)");
+    batch.addStatement("UPDATE players SET ...");
+});
+```
+
+### Player Account Operations
+
+```java
+// Load account
+Optional<PlayerAccount> account = dbManager.loadAccount(username);
+
+if (account.isPresent()) {
+    // Access account data
+    UUID uuid = account.get().getUUID();
+    long registeredAt = account.get().getRegisteredAt();
+}
+
+// Save account
+dbManager.saveAccount(account);
+
+// Delete account
+dbManager.deleteAccount(username);
+
+// Check account exists
+boolean exists = dbManager.accountExists(username);
+```
+
+### Session Operations
+
+```java
+// Create session
+Session session = new Session(player, Duration.ofHours(24));
+dbManager.saveSession(session);
+
+// Load session
+Optional<Session> session = dbManager.loadSession(sessionId);
+
+// Update session
+session.setLastActive(System.currentTimeMillis());
+dbManager.updateSession(session);
+
+// Delete session
+dbManager.deleteSession(sessionId);
+
+// Clean expired sessions
+int cleaned = dbManager.cleanExpiredSessions();
+```
+
+## Custom Tables
+
+### Creating Custom Tables
+
+```java
+// Create custom table
+dbManager.executeUpdate("""
+    CREATE TABLE IF NOT EXISTS custom_player_data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(16) NOT NULL,
+        data_key VARCHAR(64) NOT NULL,
+        data_value TEXT,
+        created_at BIGINT NOT NULL,
+        INDEX idx_username (username),
+        INDEX idx_data_key (data_key)
+    )
+""");
+```
+
+### Custom Queries
+
+```java
+// Insert custom data
+dbManager.executeUpdate(
+    "INSERT INTO custom_player_data (username, data_key, data_value, created_at) VALUES (?, ?, ?, ?)",
+    username, "custom_key", "custom_value", System.currentTimeMillis()
+);
+
+// Query custom data
+dbManager.executeQuery(
+    "SELECT * FROM custom_player_data WHERE username = ?",
+    (resultSet) -> {
+        while (resultSet.next()) {
+            String key = resultSet.getString("data_key");
+            String value = resultSet.getString("data_value");
+            // Process data
+        }
+    },
+    username
+);
+```
+
+## Transactions
+
+### Transaction Management
+
+```java
+// Execute transaction
+dbManager.executeTransaction(() -> {
+    // Multiple related operations
+    dbManager.saveAccount(account);
+    dbManager.saveSession(session);
+    dbManager.executeUpdate("INSERT INTO logs (...) VALUES (...)");
+    
+    // All operations will be committed or rolled back together
+});
+```
+
+### Transaction with Result
+
+```java
+// Transaction with return value
+boolean success = dbManager.executeTransactionWithResult(() -> {
+    dbManager.saveAccount(account);
+    dbManager.saveSession(session);
+    return true; // Return result
+});
+```
+
+## Async Operations
+
+### Async Database Calls
+
+```java
+// Async query
+CompletableFuture<List<PlayerAccount>> future = dbManager
+    .executeQueryAsync(
+        "SELECT * FROM players WHERE last_login > ?",
+        (resultSet) -> {
+            List<PlayerAccount> accounts = new ArrayList<>();
+            while (resultSet.next()) {
+                accounts.add(mapToAccount(resultSet));
+            }
+            return accounts;
+        },
+        timestamp
+    );
+
+// Handle result
+future.thenAccept(accounts -> {
+    // Process accounts
+}).exceptionally(throwable -> {
+    // Handle error
+    logger.error("Database error", throwable);
+    return null;
+});
+```
+
+### Batch Async Operations
+
+```java
+// Async batch operation
+List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+for (PlayerAccount account : accounts) {
+    CompletableFuture<Void> future = dbManager
+        .saveAccountAsync(account)
+        .thenAccept(saved -> {
+            // Account saved
+        });
+    
+    futures.add(future);
+}
+
+// Wait for all to complete
+CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+    .thenAccept(v -> {
+        logger.info("All accounts saved");
+    });
+```
+
+## Connection Pooling
+
+### Pool Configuration
+
+```hocon
+database {
+    type=nexauth-mysql
+    properties {
+        mysql {
+            host="localhost"
+            port=3306
+            database="nexauth"
+            user="nexauth"
+            password="yourpassword"
+            max-life-time=600000
+        }
+    }
+    transient-retries=3
+    transient-retry-delay-ms=250
+}
+```
+
+### Programmatic Configuration
+
+```java
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:mysql://localhost:3306/nexauth");
+config.setUsername("nexauth");
+config.setPassword("password");
+config.setMaximumPoolSize(20);
+config.setMinimumIdle(5);
+config.setConnectionTimeout(30000);
+config.setIdleTimeout(600000);
+config.setMaxLifetime(1800000);
+
+HikariDataSource dataSource = new HikariDataSource(config);
+DatabaseManager dbManager = new DatabaseManager(dataSource);
+```
+
+## Database Migration
+
+### Schema Migration
+
+```java
+// Create migration
+public class AddLastLoginColumn implements Migration {
+    @Override
+    public String getName() {
+        return "add_last_login_column";
+    }
+    
+    @Override
+    public void up(DatabaseManager db) {
+        db.executeUpdate("ALTER TABLE players ADD COLUMN last_login BIGINT");
+    }
+    
+    @Override
+    public void down(DatabaseManager db) {
+        db.executeUpdate("ALTER TABLE players DROP COLUMN last_login");
+    }
+}
+
+// Register migration
+dbManager.registerMigration(new AddLastLoginColumn());
+
+// Run migrations
+dbManager.runMigrations();
+```
+
+### Migration System
+
+```java
+// Check migration status
+MigrationStatus status = dbManager.getMigrationStatus();
+
+// Run pending migrations
+if (status.hasPendingMigrations()) {
+    dbManager.runMigrations();
+}
+
+// Rollback migration
+dbManager.rollbackMigration("add_last_login_column");
+```
+
+## Performance Optimization
+
+### Query Optimization
+
+```java
+// Use prepared statements
+dbManager.executeQuery(
+    "SELECT * FROM players WHERE username = ? AND uuid = ?",
+    resultSet -> { /* process */ },
+    username, uuid
+);
+
+// Use indexes in schema
+dbManager.executeUpdate(
+    "CREATE INDEX idx_username ON players(username)"
+);
+
+// Limit result sets
+dbManager.executeQuery(
+    "SELECT * FROM players LIMIT 100",
+    resultSet -> { /* process */ }
+);
+```
+
+### Caching Strategy
+
+```java
+// Cache frequently accessed data
+LoadingCache<String, PlayerAccount> cache = Caffeine.newBuilder()
+    .maximumSize(1000)
+    .expireAfterWrite(5, TimeUnit.MINUTES)
+    .build(key -> {
+        return dbManager.loadAccount(key).orElse(null);
+    });
+
+// Use cache
+PlayerAccount account = cache.get(username);
+```
+
+## Error Handling
+
+### Database Exceptions
+
+```java
+try {
+    dbManager.executeUpdate("INSERT INTO players (...) VALUES (...)");
+} catch (DatabaseException e) {
+    if (e.isDuplicateKey()) {
+        // Handle duplicate key
+    } else if (e.isConnectionError()) {
+        // Handle connection error
+    } else {
+        // Handle other errors
+        logger.error("Database error", e);
+    }
+}
+```
+
+### Retry Logic
+
+```java
+// Retry with exponential backoff
+int maxRetries = 3;
+int retryCount = 0;
+boolean success = false;
+
+while (retryCount < maxRetries && !success) {
+    try {
+        dbManager.executeUpdate("INSERT INTO players (...) VALUES (...)");
+        success = true;
+    } catch (DatabaseException e) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+            Thread.sleep(1000L * retryCount); // Exponential backoff
+        } else {
+            throw e;
+        }
+    }
+}
+```
+
+## Best Practices
+
+<Checklist>
+- ✅ Use prepared statements to prevent SQL injection
+- ✅ Implement proper connection pooling
+- ✅ Use async operations for database calls
+- ✅ Handle database exceptions gracefully
+- ✅ Implement retry logic for transient failures
+- ✅ Use transactions for related operations
+- ✅ Optimize queries with proper indexes
+- ✅ Cache frequently accessed data
+</Checklist>
+
+## Next Steps
+
+<Card title="Crypto API" icon="lock" href="/nexauth/api/crypto">
+Cryptography utilities for secure data handling.
+</Card>

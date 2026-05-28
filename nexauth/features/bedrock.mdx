@@ -1,0 +1,65 @@
+---
+title: "Bedrock Edition Support"
+description: "Native Floodgate integration for Bedrock player authentication"
+icon: 'mobile'
+---
+
+# Bedrock Edition Support
+
+NexAuth provides native integration with Floodgate, allowing Bedrock Edition players to join Java Edition servers with proper authentication.
+
+## Overview
+
+Through Floodgate integration, Bedrock players can join your server while maintaining proper authentication and account management.
+
+<Features>
+  <Feature 
+    icon="mobile"
+    title="Floodgate Integration"
+    description="Native support for Bedrock players via Floodgate plugin."
+  />
+  <Feature 
+    icon="user-check"
+    title="Auto-Registration"
+    description="Automatic account creation for Bedrock players."
+  />
+  <Feature 
+    icon="palette"
+    title="Skin Support"
+    description="Bedrock player skin handling and display."
+  />
+</Features>
+
+## Configuration
+
+```hocon
+# Sets which method should be used for creating fixed UUID when a new player is created.
+# Available Creators: RANDOM, CRACKED, MOJANG
+new-uuid-creator=CRACKED
+
+# Profile conflict resolution strategy: BLOCK, USE_OFFLINE, OVERWRITE
+profile-conflict-resolution-strategy=BLOCK
+```
+
+## Requirements
+
+- Floodgate plugin installed and configured
+- Geyser proxy or plugin for Bedrock connectivity
+- Proper Floodgate-Spigot integration
+
+## Bedrock-Specific Features
+
+- Auto-registration with Floodgate UUIDs
+- Skin loading and conversion
+- Separate authentication handling
+- Cross-platform chat support
+
+## Troubleshooting
+
+Ensure Floodgate is properly configured before enabling NexAuth Bedrock support.
+
+## Next Steps
+
+<Card title="Security Features" icon="shield" href="/nexauth/features/security">
+Learn about security features and best practices.
+</Card>
